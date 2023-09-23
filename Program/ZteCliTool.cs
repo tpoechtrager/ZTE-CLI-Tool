@@ -44,8 +44,9 @@ public class ZteCliTool
   private CommandLineArgs? ParseCommandLineArgs(string[] args)
   {
     var parsedArgs = new CommandLineArgs();
+    int startIndex = Environment.OSVersion.Platform == PlatformID.Unix ? 1 : 0;
 
-    for (int i = 0; i < args.Length; i++) {
+    for (int i = startIndex; i < args.Length; i++) {
       string arg = args[i];
       string getNextArg()
       {
