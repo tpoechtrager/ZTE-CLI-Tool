@@ -44,6 +44,11 @@ public class ZteCliTool
   private CommandLineArgs? ParseCommandLineArgs(string[] args)
   {
     var parsedArgs = new CommandLineArgs();
+
+    if (args.Length == 0) {
+      return parsedArgs;
+    }
+
     int startIndex = args[0].StartsWith('/') || args[0].StartsWith("./") ? 1 : 0;
 
     for (int i = startIndex; i < args.Length; i++) {
