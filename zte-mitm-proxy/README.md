@@ -36,5 +36,5 @@ Easy to set up and use
 
     ./zte-mitm-proxy --router-ip <ZTE router IP> --listen-port <Proxy listen port>  
 
-Configure ZTE-CLI-Tool to use the proxy.
+Configure ZTE-CLI-Tool to use the proxy.  
 Execute CLI commands as usual.
