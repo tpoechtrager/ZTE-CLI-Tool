@@ -63,6 +63,7 @@ public class ZteCliTool
         case "--ip":
           parsedArgs.RouterIp = getNextArg();
           break;
+        case "--router-password":
         case "--pass":
         case "--password":
           parsedArgs.RouterPassword = getNextArg();
