@@ -44,7 +44,7 @@ public class ZteCliTool
   private CommandLineArgs? ParseCommandLineArgs(string[] args)
   {
     var parsedArgs = new CommandLineArgs();
-    int startIndex = Environment.OSVersion.Platform == PlatformID.Unix ? 1 : 0;
+    int startIndex = args[0].StartsWith('/') || args[0].StartsWith("./") ? 1 : 0;
 
     for (int i = startIndex; i < args.Length; i++) {
       string arg = args[i];
@@ -54,6 +54,7 @@ public class ZteCliTool
       }
 
       switch (arg) {
+        case "--router-ip":
         case "--ip":
           parsedArgs.RouterIp = getNextArg();
           break;

@@ -1,8 +1,7 @@
 {
   "profiles": {
     "ZTE-Cli-Tool": {
-      "commandName": "Project",
-      "commandLineArgs": "--abc"
+      "commandName": "Project"
     }
   }
 }
