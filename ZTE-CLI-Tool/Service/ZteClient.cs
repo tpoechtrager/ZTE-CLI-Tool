@@ -17,8 +17,6 @@
 
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using ZTE_Cli_Tool.DTO;
 using ZTE_Cli_Tool.Service.Interface;
 
@@ -28,9 +26,12 @@ public class ZteClient : IZteClient, IDisposable
 {
   private readonly ILogger<ZteClient> _logger;
   private readonly IZteHttpClient _zteHttpClient;
-  private readonly SHA256 sha256 = SHA256.Create();
 
   private string _routerPassword = "";
+
+  private bool _useNewApi = false;
+  private Func<string, string> _hash = Tools.ZteMd5;
+
   private bool _loggedIn = false;
   private int _successfulLogins = 0;
 
@@ -85,27 +86,35 @@ public class ZteClient : IZteClient, IDisposable
   {
     _routerPassword = routerPassword;
     await _zteHttpClient.InitializeAsync(routerIpAddress);
+
+    var json = await _zteHttpClient.ApiGetAsJsonAsync("wa_inner_version");
+
+    if (json is null) {
+      return;
+    }
+
+    var waInnerVersion = Tools.Deserializer<WaInnerVersion>.Deserialize(json, out _);
+
+    if (waInnerVersion is null) {
+      return;
+    }
+
+    string[] devicesWithNewApi = new[] {
+      "MC888", "MC889"
+    };
+
+    foreach (var device in devicesWithNewApi) {
+      if (waInnerVersion.Version.Contains(device, StringComparison.OrdinalIgnoreCase)) {
+        _useNewApi = true;
+        _hash = Tools.ZteSha256;
+        break;
+      }
+    }
   }
 
   public void Dispose()
   {
     _zteHttpClient.Dispose(); // Needed?
-    sha256.Dispose();
-  }
-
-  /// <summary>
-  /// Computes and returns an upper-cased SHA256 hash of the input text.
-  /// ZTE's API compares SHA256 hashes in upper-case.
-  /// </summary>
-  /// <param name="text">The text to hash.</param>
-  /// <returns>
-  /// The upper-cased SHA256 hash as a string.
-  /// </returns>
-
-  private string ZteSha256(string text)
-  {
-    byte[] result = sha256.ComputeHash(Encoding.UTF8.GetBytes(text));
-    return Convert.ToHexString(result).ToUpper();
   }
 
   /// <summary>
@@ -170,34 +179,42 @@ public class ZteClient : IZteClient, IDisposable
       return null;
     }
 
-    return ZteSha256(ZteSha256(nv.WaInnerVersion + nv.CrVersion) + nv.RD);
+    return _hash(_hash(nv.WaInnerVersion + nv.CrVersion) + nv.RD);
   }
 
   /// <summary>
   /// Builds a set request with the specified goFormId and AD hash.
   /// </summary>
   /// <param name="goFormId">The goFormId for the request.</param>
+  /// <param name="skipAd">
+  /// Set to true to skip AD calculation; otherwise, 
+  /// AD will be calculated and included in the request.</param>
   /// <returns>
   /// A dictionary containing the request parameters, or null if AD calculation fails.
   /// </returns>
 
-  private async Task<Dictionary<string, string>?> BuildSetRequest(string goFormId)
+  private async Task<Dictionary<string, string>?> BuildSetRequest(string goFormId, bool skipAd = false)
   {
-    string? ad = await CalculateAdAsync();
+    var setRequest = new Dictionary<string, string> {
+      { "goformId", goFormId }
+    };
 
-    if (ad is null) {
-      return null;
+    if (!skipAd) {
+      string? ad = await CalculateAdAsync();
+
+      if (ad is null) {
+        return null;
+      }
+
+      setRequest.Add("AD", ad);
     }
 
-    return new Dictionary<string, string> {
-      { "goformId", goFormId },
-      { "AD", ad }
-    };
+    return setRequest;
   }
 
   /// <summary>
   /// Calculates the login hash.
-  /// Algorithm: ZTE_SHA256(ZTE_SHA256("<PW>") + LD)
+  /// Algorithm: SHA256(SHA256("<PW>") + LD)
   /// </summary>
   /// <returns>
   /// The calculated login hash if successful; otherwise, null.
@@ -211,13 +228,13 @@ public class ZteClient : IZteClient, IDisposable
       return null;
     }
 
-    string? hashRouterPassword = ZteSha256(_routerPassword);
+    string? hashRouterPassword = Tools.ZteSha256(_routerPassword);
 
     if (hashRouterPassword is null) {
       return null;
     }
 
-    string? loginHash = ZteSha256(hashRouterPassword + nvLd);
+    string? loginHash = Tools.ZteSha256(hashRouterPassword + nvLd);
 
     if (hashRouterPassword is null) {
       return null;
@@ -226,7 +243,7 @@ public class ZteClient : IZteClient, IDisposable
     return loginHash;
   }
 
-  public async Task<int?> LoginAsync()
+  private async Task<int?> LoginHelperAsync(bool developerLogin = false)
   {
     string? loginHash = await CalculateLoginHashAsync();
 
@@ -235,11 +252,16 @@ public class ZteClient : IZteClient, IDisposable
       return null;
     }
 
-    string? resultJson = await _zteHttpClient
-      .ApiSetAsJsonAsync(new Dictionary<string, string> {
-        { "goformId", "LOGIN" },
-        { "password", loginHash }
-      });
+    var setRequest = await BuildSetRequest(
+      developerLogin ? "DEVELOPER_OPTION_LOGIN" : "LOGIN", !developerLogin);
+
+    if (setRequest is null) {
+      return null;
+    }
+
+    setRequest.Add("password", loginHash);
+
+    string? resultJson = await _zteHttpClient.ApiSetAsJsonAsync(setRequest);
 
     if (resultJson is null) {
       return null;
@@ -259,14 +281,26 @@ public class ZteClient : IZteClient, IDisposable
 
     if (!loginResult.LoginSuccess()) {
       string loginErrorString = loginResult.GetErrorString();
-      _logger.LogError($"Login failed: {loginErrorString}");
+      _logger.LogError("Login {0}failed: {1}", developerLogin ? "as developer " : "", loginErrorString);
       return loginResult.Code;
     }
 
     _loggedIn = true;
+
     _successfulLogins++;
 
     return (int)LoginResult.LoginErrorCode.LOGIN_OK;
+  }
+
+  public async Task<int?> LoginAsync()
+  {
+    int? result = await LoginHelperAsync();
+
+    if (_useNewApi) {
+      await LoginHelperAsync(true);
+    }
+
+    return result;
   }
 
   public async Task<bool> CheckLoginAsync()
@@ -351,9 +385,9 @@ public class ZteClient : IZteClient, IDisposable
 
         List<int> bandList = new();
 
-        for (int i = 1; i < 100; i++) {
+        for (int i = 0; i < 64; i++) {
           if ((bandMask & (1L << i)) != 0) {
-            bandList.Add(i);
+            bandList.Add(i + 1);
           }
         }
 
@@ -412,7 +446,7 @@ public class ZteClient : IZteClient, IDisposable
 
     if (bands is not null) {
       foreach (int band in bands) {
-        bandMask |= (1L << band);
+        bandMask |= (1L << (band - 1));
       }
     } else {
       bandMask = Tools.ParseHexAsInt64("0xA3E2AB0908DF")!.Value;
@@ -421,7 +455,7 @@ public class ZteClient : IZteClient, IDisposable
     setRequest.Add("is_gw_band", "0");
     setRequest.Add("gw_band_mask", "0");
     setRequest.Add("is_lte_band", "1");
-    setRequest.Add("lte_band_mask", "0x" + bandMask.ToString("X"));
+    setRequest.Add("lte_band_mask", "0x" + bandMask.ToString("X").PadLeft(11, '0'));
 
     return await _zteHttpClient.ApiSetAsync(setRequest);
   }

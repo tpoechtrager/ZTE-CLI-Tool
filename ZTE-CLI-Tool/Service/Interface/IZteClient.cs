@@ -42,7 +42,7 @@ public interface IZteClient : IDisposable
   Task InitializeServiceAsync(string routerIpAddress, string routerPassword);
 
   /// <summary>
-  /// Attempts to log in and returns a LoginErrorCode.
+  /// Attempts to log in wand returns a LoginErrorCode.
   /// </summary>
   /// <returns>The LoginErrorCode if the login is successful; otherwise, null.</returns>
   Task<int?> LoginAsync();

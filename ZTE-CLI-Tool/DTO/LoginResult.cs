@@ -27,6 +27,11 @@ public class LoginResult
 
   public bool ParseResult()
   {
+    if (CodeAsString == "failure") {
+      Code = (int)LoginErrorCode.LOGIN_FAILURE;
+      return true;
+    }
+
     var parsedCode = Tools.ParseInt(CodeAsString);
 
     if (parsedCode is null) {
@@ -56,13 +61,15 @@ public class LoginResult
     LOGIN_OK,
     LOGIN_ERROR_TRY_AGAIN_LATER,
     LOGIN_ERROR_DUPLICATE_USER,
-    LOGIN_ERROR_WRONG_PASSWORD
+    LOGIN_ERROR_WRONG_PASSWORD,
+    LOGIN_FAILURE
   }
 
   private readonly string[] LOGIN_ERROR_STRINGS = new string[] {
     "Login Success",
     "Try again later",
     "Duplicate User",
-    "Wrong Password"
+    "Wrong Password",
+    "Login Failure"
   };
 }

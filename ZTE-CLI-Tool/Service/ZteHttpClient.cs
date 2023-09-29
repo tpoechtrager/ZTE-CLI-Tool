@@ -49,18 +49,31 @@ public class ZteHttpClient : IZteHttpClient, IDisposable
 
   public async Task InitializeAsync(string routerIpAddress)
   {
+    // Determine wether to use HTTP or HTTPS
+
     _routerIpAddress = routerIpAddress;
 
-    // Try to figure out whether the router uses https or http
     _httpProtocol = "https";
 
     if (!(await ApiRequestAsync("index.html", null, true)).success) {
       _httpProtocol = "http";
     }
 
-    // Add default HttpClient headers
-    httpClient.DefaultRequestHeaders.Add("Referer", $"{_httpProtocol}://{_routerIpAddress}/index.html");
+    // Http Headers
+    httpClient.DefaultRequestHeaders.Add("Referer", $"{_httpProtocol}://{_routerIpAddress}");
     httpClient.DefaultRequestHeaders.Add("X-Requested-With", "XMLHttpRequest");
+
+    // Set Firefox User-Agent
+    Random random = new();
+
+    int userAgentFirefoxVersion = random.Next(117, 200);
+    int userAgentFirefoxRv = random.Next(109, userAgentFirefoxVersion - 8);
+
+    string userAgent =
+      string.Format("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:{0}.0) Gecko/20100101 Firefox/{1}.0",
+      userAgentFirefoxRv, userAgentFirefoxVersion);
+
+    httpClient.DefaultRequestHeaders.Add("User-Agent", userAgent);
   }
 
   /// <summary>
@@ -168,7 +181,7 @@ public class ZteHttpClient : IZteHttpClient, IDisposable
 
   private async Task<ApiResult?> ApiSetHelperAsync(Dictionary<string, string>? post)
   {
-    var result = await ApiRequestAsync("/goform/goform_set_cmd_process", post);
+    var result = await ApiRequestAsync("goform/goform_set_cmd_process", post);
 
     if (!result.success) {
       _logger.LogError("Request failed");

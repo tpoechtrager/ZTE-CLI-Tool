@@ -15,6 +15,8 @@
  * Year: 2023
  */
 
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -22,6 +24,34 @@ namespace ZTE_Cli_Tool;
 
 public static class Tools
 {
+  /// <summary>
+  /// Computes and returns an upper-cased SHA256 hash of the input text.
+  /// </summary>
+  /// <param name="text">The text to hash.</param>
+  /// <returns>
+  /// The upper-cased SHA256 hash as a string.
+  /// </returns>
+
+  public static string ZteSha256(string text)
+  {
+    byte[] result = SHA256.HashData(Encoding.UTF8.GetBytes(text));
+    return Convert.ToHexString(result).ToUpper();
+  }
+
+  /// <summary>
+  /// Computes and returns an upper-cased MD5 hash of the input text.
+  /// </summary>
+  /// <param name="text">The text to hash.</param>
+  /// <returns>
+  /// The upper-cased MD5 hash as a string.
+  /// </returns>
+
+  public static string ZteMd5(string text)
+  {
+    byte[] result = MD5.HashData(Encoding.UTF8.GetBytes(text));
+    return Convert.ToHexString(result).ToUpper();
+  }
+
   public static bool IsNumber(string str)
   {
     return float.TryParse(str, out _);
