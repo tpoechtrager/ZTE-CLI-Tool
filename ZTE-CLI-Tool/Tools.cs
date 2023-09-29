@@ -36,10 +36,28 @@ public static class Tools
     return null;
   }
 
+  public static int ParseInt(string str, int errorValue)
+  {
+    if (int.TryParse(str, out int val)) {
+      return val;
+    }
+
+    return errorValue;
+  }
+
   public static int? ParseHexAsInt(string str)
   {
     try {
       return Convert.ToInt32(str, 16);
+    } catch (Exception) {
+      return null;
+    }
+  }
+
+  public static Int64? ParseHexAsInt64(string str)
+  {
+    try {
+      return Convert.ToInt64(str, 16);
     } catch (Exception) {
       return null;
     }
@@ -95,5 +113,19 @@ public static class Tools
         return default;
       }
     }
+  }
+
+  public static IEnumerable<int> ConvertBandsToList(string bands, char separator = '+')
+  {
+    List<int> bandList = new();
+
+    foreach (string b in bands.Split(separator)) {
+      int band = Tools.ParseInt(Tools.RemoveNonNumericCharacters(b), -1);
+      if (band != -1) {
+        bandList.Add(band);
+      }
+    }
+
+    return bandList;
   }
 }

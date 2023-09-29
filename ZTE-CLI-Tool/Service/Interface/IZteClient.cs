@@ -60,17 +60,17 @@ public interface IZteClient : IDisposable
   Task PreventAutoLogoutAsync();
 
   /// <summary>
-  /// Sets the New Radio (NR) bands for the ZTE device.
-  /// </summary>
-  /// <param name="bands">A +-separated string of NR bands to set. Use "auto" for automatic selection.</param>
-  /// <returns>True if the operation was successful, otherwise false.</returns>
-  Task<bool> SetNrBandsAsync(string bands = "auto");
-
-  /// <summary>
   /// Retrieves the NR (New Radio) bands settings from the API.
   /// </summary>
   /// <returns>An IEnumerable of integers representing NR bands settings, or null if the operation fails.</returns>
-  Task<IEnumerable<int>?> GetSetNrBandsAsync();
+  Task<IEnumerable<int>?> GetNrBandLockAsync();
+
+  /// <summary>
+  /// Sets the New Radio (NR) bands for the ZTE device. Use null to set all bands for automatic selection.
+  /// </summary>
+  /// <param name="bands">An optional collection of NR bands to set as integers or null to set all bands.</param>
+  /// <returns>True if the operation was successful, otherwise false.</returns>
+  Task<bool> SetNrBandLockAsync(IEnumerable<int>? bands);
 
   /// <summary>
   /// Performs NR band hopping by setting two sets of NR bands.
@@ -79,6 +79,19 @@ public interface IZteClient : IDisposable
   /// <param name="bands2">The second set of NR bands to set.</param>
   /// <returns>True if both sets of NR bands are set successfully, false otherwise.</returns>
   Task<bool> PerformNrBandHopAsync(string bands1, string bands2);
+
+  /// <summary>
+  /// Sets the LTE bands for the ZTE device. Use null to set all bands for automatic selection.
+  /// </summary>
+  /// <param name="bands">An optional collection of LTE bands to set as integers or null to set all bands.</param>
+  /// <returns>True if the operation was successful, otherwise false.</returns>
+  Task<bool> SetLteBandLockAsync(IEnumerable<int>? bands);
+
+  /// <summary>
+  /// Retrieves the LTE bands settings from the API.
+  /// </summary>
+  /// <returns>An IEnumerable of integers representing LTE bands settings, or null if the operation fails.</returns>
+  Task<IEnumerable<int>?> GetLteBandLockAsync();
 
   /// <summary>
   /// Updates device information asynchronously.

@@ -38,8 +38,15 @@ public class ZteCliTool
   {
     public string RouterIp { get; set; } = "192.168.0.10";
     public string RouterPassword { get; set; } = "admin1";
-    public string? PerformNrBandHop { get; set; }
+
+    // NR
     public bool PrintSetNrBands { get; set; } = false;
+    public string? SetNrBandLock { get; set; } = null;
+    public string? PerformNrBandHop { get; set; }
+
+    // LTE
+    public bool PrintLteBandLock { get; set; } = false;
+    public string? SetLteBandLock { get; set; } = null;
   }
 
   private CommandLineArgs? ParseCommandLineArgs(string[] args)
@@ -69,14 +76,25 @@ public class ZteCliTool
         case "--password":
           parsedArgs.RouterPassword = getNextArg();
           break;
+        // NR
+        case "--print-nr-band-lock":
+          parsedArgs.PrintSetNrBands = true;
+          break;
+        case "--set-nr-band-lock":
+          parsedArgs.SetNrBandLock = getNextArg();
+          break;
         case "--perform-nr-band-hop":
           parsedArgs.PerformNrBandHop = getNextArg();
           break;
-        case "--print-set-nr-bands":
-          parsedArgs.PrintSetNrBands = true;
+        // LTE
+        case "--print-lte-band-lock":
+          parsedArgs.PrintLteBandLock = true;
+          break;
+        case "--set-lte-band-lock":
+          parsedArgs.SetLteBandLock = getNextArg();
           break;
         default:
-          _logger.LogError("Unknown command line argument: " + arg);
+          _logger.LogError($"Unknown command line argument: {arg}");
           return null;
       }
     }
@@ -96,10 +114,22 @@ public class ZteCliTool
 
   private async Task<bool?> ExecuteCommandAsync(IZteClient zteClient, CommandLineArgs parsedArgs)
   {
-    if (parsedArgs.PerformNrBandHop is not null) {
-      return await _command.PerformNrBandHopAsync(zteClient, parsedArgs.PerformNrBandHop);
-    } else if (parsedArgs.PrintSetNrBands) {
-      return await _command.PrintSetNrBandsAsync(zteClient);
+    // NR
+
+    if (parsedArgs.PrintSetNrBands) {
+      return await _command.PrintNrBandLockAsync();
+    } else if (parsedArgs.SetNrBandLock is not null) {
+      return await _command.SetNrBandLockAsync(parsedArgs.SetNrBandLock);
+    } else if (parsedArgs.PerformNrBandHop is not null) {
+      return await _command.PerformNrBandHopAsync(parsedArgs.PerformNrBandHop);
+    }
+
+    // LTE
+
+    else if (parsedArgs.PrintLteBandLock) {
+      return await _command.PrintLteBandLockAsync();
+    } else if (parsedArgs.SetLteBandLock is not null) {
+      return await _command.SetLteBandLockAsync(parsedArgs.SetLteBandLock);
     }
 
     return null;

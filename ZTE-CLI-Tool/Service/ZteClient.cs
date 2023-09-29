@@ -309,47 +309,123 @@ public class ZteClient : IZteClient, IDisposable
     }
   }
 
-  public async Task<bool> SetNrBandsAsync(string bands = "auto")
+  private static class GetBandLockHelper<T>
   {
-    bands = bands.Replace('+', ',');
+    public static async Task<string?> GetBandLockAsString(
+      ILogger logger, IZteHttpClient zteHttpClient, string request)
+    {
+      var bandsJson = await zteHttpClient.ApiGetAsJsonAsync(request);
 
+      if (bandsJson is null) {
+        return null;
+      }
+
+      dynamic? bandLock = Tools.Deserializer<T>.Deserialize(bandsJson, out string errorMessage);
+
+      if (bandLock is null) {
+        logger.LogError($"Could not deserialize band lock Json: {errorMessage}");
+        return null;
+      }
+
+      return ((string)bandLock.Bands);
+    }
+
+    public static async Task<IEnumerable<int>?> GetSetBandsAsListAsync(
+      ILogger logger, IZteHttpClient zteHttpClient, string request)
+    {
+      var bands = await GetBandLockAsString(logger, zteHttpClient, request);
+
+      if (bands is null) {
+        return null;
+      }
+
+      bands = bands.ToLower();
+
+      if (bands.StartsWith("0x")) {
+        // Band mask
+        Int64? bandMask = Tools.ParseHexAsInt64(bands);
+
+        if (bandMask is null) {
+          return null;
+        }
+
+        List<int> bandList = new();
+
+        for (int i = 1; i < 100; i++) {
+          if ((bandMask & (1L << i)) != 0) {
+            bandList.Add(i);
+          }
+        }
+
+        return bandList;
+      } else {
+        // Band string (1,2,3)
+        return bands.Split(',').Select(str => Tools.ParseInt(Tools.RemoveNonNumericCharacters(str), -1));
+      }
+    }
+  }
+
+  public async Task<bool> SetNrBandLockAsync(IEnumerable<int>? bands)
+  {
     var setRequest = await BuildSetRequest("WAN_PERFORM_NR5G_BAND_LOCK");
 
     if (setRequest is null) {
       return false;
     }
 
-    if (bands == "auto") {
-      bands = "1,2,3,5,7,8,20,28,38,41,50,51,66,70,71,74,75,76,77,78,79,80,81,82,83,84";
+    if (bands is null) {
+      string defaultBandList = "1,2,3,5,7,8,20,28,38,41,50,51,66,70,71,74,75,76,77,78,79,80,81,82,83,84";
+      bands = Tools.ConvertBandsToList(defaultBandList, ',');
     }
 
-    setRequest.Add("nr5g_band_mask", bands);
+    setRequest.Add("nr5g_band_mask", string.Join(',', bands));
 
     return await _zteHttpClient.ApiSetAsync(setRequest);
   }
 
-  public async Task<IEnumerable<int>?> GetSetNrBandsAsync()
+  public async Task<IEnumerable<int>?> GetNrBandLockAsync()
   {
-    var bandsJson = await _zteHttpClient.ApiGetAsJsonAsync("nr5g_sa_band_lock");
-
-    if (bandsJson is null) {
-      return null;
-    }
-
-    var saBandLock = Tools.Deserializer<SaBandLock>.Deserialize(bandsJson, out string errorMessage);
-
-    if (saBandLock is null) {
-      _logger.LogError($"Could not deserialize band lock Json: {errorMessage}");
-      return null;
-    }
-
-    return saBandLock.Bands.Split(',').Select(str => int.Parse(str));
+    return await GetBandLockHelper<SaBandLock>.GetSetBandsAsListAsync(_logger, _zteHttpClient, "nr5g_sa_band_lock");
   }
 
   public async Task<bool> PerformNrBandHopAsync(string bands1, string bands2)
   {
-    return await SetNrBandsAsync(bands1) && await SetNrBandsAsync(bands2);
+    return await SetNrBandLockAsync(Tools.ConvertBandsToList(bands1)) &&
+           await SetNrBandLockAsync(Tools.ConvertBandsToList(bands2));
   }
+
+
+  public async Task<IEnumerable<int>?> GetLteBandLockAsync()
+  {
+    return await GetBandLockHelper<LteBandLock>.GetSetBandsAsListAsync(_logger, _zteHttpClient, "lte_band_lock");
+  }
+
+  public async Task<bool> SetLteBandLockAsync(IEnumerable<int>? bands)
+  {
+    var setRequest = await BuildSetRequest("BAND_SELECT");
+
+    if (setRequest is null) {
+      return false;
+    }
+
+    Int64 bandMask = 0;
+
+    if (bands is not null) {
+      foreach (int band in bands) {
+        bandMask |= (1L << band);
+      }
+    } else {
+      bandMask = Tools.ParseHexAsInt64("0xA3E2AB0908DF")!.Value;
+    }
+
+    setRequest.Add("is_gw_band", "0");
+    setRequest.Add("gw_band_mask", "0");
+    setRequest.Add("is_lte_band", "1");
+    setRequest.Add("lte_band_mask", "0x" + bandMask.ToString("X"));
+
+    return await _zteHttpClient.ApiSetAsync(setRequest);
+  }
+
 
   public async Task<bool> UpdateDeviceInfoAsync()
   {
