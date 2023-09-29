@@ -82,10 +82,10 @@ public class Command
     IEnumerable<int> bandList = Tools.ConvertBandsToList(bands);
 
     if (await setBandLockAsync(bandList.Any() ? bandList : null)) {
-      Console.WriteLine($"Set {type} bands successfully!");
+      Console.WriteLine($"Set {type} band lock to {bands}!");
       return true;
     } else {
-      Console.Error.WriteLine($"Could not set {type} bands!");
+      Console.Error.WriteLine($"Could not set {type} band lock to {bands}!");
       return false;
     }
   }
@@ -132,10 +132,10 @@ public class Command
   public async Task<bool> SetNetworkModeAsync(string mode)
   {
     if (await _zteClient.SetNetworkModeAsync(mode)) {
-      Console.WriteLine("Set network mode successfully!");
+      Console.WriteLine($"Set network mode to {mode}!");
       return true;
     } else {
-      Console.Error.WriteLine("Setting network mode failed!");
+      Console.Error.WriteLine($"Setting network mode to ${mode} failed!");
       return false;
     }
 

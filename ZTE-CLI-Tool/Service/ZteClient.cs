@@ -483,7 +483,10 @@ public class ZteClient : IZteClient, IDisposable
     {"3G_preferred", "WCDMA_preferred"},
     {"TCHGWL+5G", "TCHGWL_5G"},
     {"TGWL+5G", "TGWL_AND_5G"},
-    {"WL+5G", "WL_AND_5G"}
+    {"WL+5G", "WL_AND_5G"},
+
+    {"NSA", "Only_5G"},
+    {"SA", "Only_5G"}
   };
 
   private string? GetNetworkModeValue(string mode)
