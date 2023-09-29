@@ -176,7 +176,7 @@ public class SignalInfo
         signalValue.Max, Math.Round(signalValue.Average, 2));
   }
 
-  public float GetTotalBandwidth()
+  private float GetTotalBandwidth()
   {
     float totalBandwidth = 0;
     bool hasUndefinedBandwidth = false;
@@ -206,7 +206,7 @@ public class SignalInfo
     return hasUndefinedBandwidth ? -1 : totalBandwidth;
   }
 
-  public IEnumerable<string> GetBands()
+  private IEnumerable<string> GetBands()
   {
     if (networkType.IsLte) {
       foreach (var cell in lte.cells) {

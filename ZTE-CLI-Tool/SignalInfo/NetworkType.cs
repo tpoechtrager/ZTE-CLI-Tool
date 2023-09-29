@@ -28,7 +28,7 @@ public class NetworkType
     LTE,
     LTE_PLUS,
     NR_NSA_ACTIVE,
-    NR_NSA_PASSIVE, /* NR available but only LTE receipton */
+    NR_NSA_PASSIVE, // NR available but only LTE receipton
     NR_SA
   };
 

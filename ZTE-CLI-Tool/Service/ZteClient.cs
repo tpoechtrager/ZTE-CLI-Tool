@@ -296,7 +296,9 @@ public class ZteClient : IZteClient, IDisposable
   {
     int? result = await LoginHelperAsync();
 
-    if (_useNewApi) {
+    if (_useNewApi && result is not null &&
+      result == (int)LoginResult.LoginErrorCode.LOGIN_OK) {
+      // Log in as developer. Needed for certain settings.
       await LoginHelperAsync(true);
     }
 
@@ -460,6 +462,76 @@ public class ZteClient : IZteClient, IDisposable
     return await _zteHttpClient.ApiSetAsync(setRequest);
   }
 
+  // This is only used for setting the network mode
+
+  private readonly Dictionary<string, string> _networkModes = new() {
+    {"2G", "Only_GSM"},
+    {"2G+3G+4G", "GSM_WCDMA_LTE"},
+    {"2G+4G", "GSM_AND_LTE"},
+    {"3G", "Only_WCDMA"},
+    {"3G+2G", "WCDMA_AND_GSM"},
+    {"3G+4G", "WCDMA_AND_LTE"},
+    {"3G(TDSCDMA)+4G", "TDSCDMA_AND_LTE"},
+    {"4G", "Only_LTE"},
+    {"4G+5G", "LTE_AND_5G"},
+    {"5G", "Only_5G"},
+    {"CDMA+EVDO+4G", "CDMA_EVDO_LTE"},
+    {"GWL+5G", "GWL_5G"},
+    {"TD-SCDMA+WCDMA+2G+4G", "TDSCDMA_WCDMA_GSM_LTE"},
+    {"TD-SCDMA+WCDMA+HDR+CDMA+2G+4G", "TDSCDMA_WCDMA_HDR_CDMA_GSM_LTE"},
+    {"TDSCDMA+WCDMA", "TDSCDMA_AND_WCDMA"},
+    {"3G_preferred", "WCDMA_preferred"},
+    {"TCHGWL+5G", "TCHGWL_5G"},
+    {"TGWL+5G", "TGWL_AND_5G"},
+    {"WL+5G", "WL_AND_5G"}
+  };
+
+  private string? GetNetworkModeValue(string mode)
+  {
+    // Split the input mode by '+' and convert to uppercase,
+    // then sort the parts to check permutations
+    string[] modeParts = mode.ToUpper().Split('+').OrderBy(part => part).ToArray();
+
+    foreach (var entry in _networkModes) {
+      string[] entryParts = entry.Key.Split('+').OrderBy(part => part).ToArray();
+
+      // Check if the sorted parts of the input mode match the sorted parts of the dictionary key
+      if (modeParts.SequenceEqual(entryParts)) {
+        return entry.Value;
+      }
+    }
+
+    return null;
+  }
+
+  public async Task<bool> SetNetworkModeAsync(string mode)
+  {
+    var networkMode = GetNetworkModeValue(mode);
+
+    if (networkMode is null) {
+      _logger.LogError($"Invalid network mode {mode}");
+
+      Console.WriteLine("Available modes:" + Environment.NewLine);
+
+      foreach (var entry in _networkModes) {
+        Console.WriteLine(" " + entry.Key);
+      }
+
+      Console.WriteLine("");
+
+      return false;
+    }
+
+    var setRequest = await BuildSetRequest("SET_BEARER_PREFERENCE");
+
+    if (setRequest is null) {
+      return false;
+    }
+
+    setRequest.Add("BearerPreference", networkMode);
+
+    return await _zteHttpClient.ApiSetAsync(setRequest);
+  }
 
   public async Task<bool> UpdateDeviceInfoAsync()
   {

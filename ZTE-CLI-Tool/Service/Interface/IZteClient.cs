@@ -42,7 +42,7 @@ public interface IZteClient : IDisposable
   Task InitializeServiceAsync(string routerIpAddress, string routerPassword);
 
   /// <summary>
-  /// Attempts to log in wand returns a LoginErrorCode.
+  /// Attempts to log in and returns a LoginErrorCode.
   /// </summary>
   /// <returns>The LoginErrorCode if the login is successful; otherwise, null.</returns>
   Task<int?> LoginAsync();
@@ -92,6 +92,13 @@ public interface IZteClient : IDisposable
   /// </summary>
   /// <returns>An IEnumerable of integers representing LTE bands settings, or null if the operation fails.</returns>
   Task<IEnumerable<int>?> GetLteBandLockAsync();
+
+  /// <summary>
+  /// Sets the network mode.
+  /// </summary>
+  /// <param name="mode">The network mode to set.</param>
+  /// <returns>True if the network mode was set successfully; otherwise, false.</returns>
+  Task<bool> SetNetworkModeAsync(string mode);
 
   /// <summary>
   /// Updates device information asynchronously.

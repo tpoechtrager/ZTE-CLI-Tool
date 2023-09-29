@@ -47,7 +47,7 @@ public class Command
     var bands = await getBandsAsync();
 
     if (bands is null) {
-      _logger.LogError("Could not retrieve set bands!");
+      Console.Error.WriteLine("Could not retrieve set bands!");
       return false;
     }
 
@@ -82,10 +82,10 @@ public class Command
     IEnumerable<int> bandList = Tools.ConvertBandsToList(bands);
 
     if (await setBandLockAsync(bandList.Any() ? bandList : null)) {
-      Console.WriteLine($"Successfully set {type} bands!");
+      Console.WriteLine($"Set {type} bands successfully!");
       return true;
     } else {
-      _logger.LogError($"Could not set {type} bands!");
+      Console.Error.WriteLine($"Could not set {type} bands!");
       return false;
     }
   }
@@ -116,10 +116,29 @@ public class Command
     string[] bandsArgs = bands.Split('|');
 
     if (bandsArgs.Length != 2) {
-      _logger.LogError("Wrong argument to --perform-nr-band-hop.");
+      Console.Error.WriteLine("Wrong argument to --perform-nr-band-hop.");
       return false;
     }
 
     return await _zteClient.PerformNrBandHopAsync(bandsArgs[0], bandsArgs[1]);
+  }
+
+  /// <summary>
+  /// Sets the network mode and handles the result.
+  /// </summary>
+  /// <param name="mode">The network mode to set.</param>
+  /// <returns>True if the network mode was set successfully; otherwise, false.</returns>
+
+  public async Task<bool> SetNetworkModeAsync(string mode)
+  {
+    if (await _zteClient.SetNetworkModeAsync(mode)) {
+      Console.WriteLine("Set network mode successfully!");
+      return true;
+    } else {
+      Console.Error.WriteLine("Setting network mode failed!");
+      return false;
+    }
+
+
   }
 }

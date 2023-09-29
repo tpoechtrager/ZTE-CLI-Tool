@@ -47,6 +47,9 @@ public class ZteCliTool
     // LTE
     public bool PrintLteBandLock { get; set; } = false;
     public string? SetLteBandLock { get; set; } = null;
+
+    // Network
+    public string? SetNetworkMode { get; set; } = null;
   }
 
   private CommandLineArgs? ParseCommandLineArgs(string[] args)
@@ -67,6 +70,7 @@ public class ZteCliTool
       }
 
       switch (arg) {
+        case "--router":
         case "--router-ip":
         case "--ip":
           parsedArgs.RouterIp = getNextArg();
@@ -76,7 +80,9 @@ public class ZteCliTool
         case "--password":
           parsedArgs.RouterPassword = getNextArg();
           break;
+
         // NR
+
         case "--print-nr-band-lock":
           parsedArgs.PrintSetNrBands = true;
           break;
@@ -86,13 +92,23 @@ public class ZteCliTool
         case "--perform-nr-band-hop":
           parsedArgs.PerformNrBandHop = getNextArg();
           break;
+
         // LTE
+
         case "--print-lte-band-lock":
           parsedArgs.PrintLteBandLock = true;
           break;
         case "--set-lte-band-lock":
           parsedArgs.SetLteBandLock = getNextArg();
           break;
+
+        // Network
+
+        case "--set-network-mode":
+        case "--set-net-mode":
+          parsedArgs.SetNetworkMode = getNextArg();
+          break;
+
         default:
           _logger.LogError($"Unknown command line argument: {arg}");
           return null;
@@ -130,6 +146,12 @@ public class ZteCliTool
       return await _command.PrintLteBandLockAsync();
     } else if (parsedArgs.SetLteBandLock is not null) {
       return await _command.SetLteBandLockAsync(parsedArgs.SetLteBandLock);
+    }
+
+    // Network
+
+    else if (parsedArgs.SetNetworkMode is not null) {
+      return await _command.SetNetworkModeAsync(parsedArgs.SetNetworkMode);
     }
 
     return null;
