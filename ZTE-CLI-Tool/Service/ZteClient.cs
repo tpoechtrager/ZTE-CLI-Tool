@@ -485,6 +485,7 @@ public class ZteClient : IZteClient, IDisposable
     {"TGWL+5G", "TGWL_AND_5G"},
     {"WL+5G", "WL_AND_5G"},
 
+    {"LTE", "Only_LTE"},
     {"NSA", "Only_5G"},
     {"SA", "Only_5G"}
   };
