@@ -15,6 +15,7 @@
  * Year: 2023
  */
 
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace ZTE_Cli_Tool;
@@ -73,5 +74,26 @@ public static class Tools
     }
 
     return string.Empty;
+  }
+
+  public static class Deserializer<T>
+  {
+    public static T? Deserialize(string json, out string errorMessage)
+    {
+      try {
+        var obj = JsonSerializer.Deserialize<T>(json);
+
+        if (obj is null) {
+          errorMessage = "JsonSerializer.Deserialize() returned null";
+        } else {
+          errorMessage = String.Empty;
+        }
+
+        return obj;
+      } catch (Exception e) {
+        errorMessage = e.Message;
+        return default;
+      }
+    }
   }
 }

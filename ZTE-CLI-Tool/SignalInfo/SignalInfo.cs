@@ -94,7 +94,7 @@ public class SignalInfo
     return true;
   }
 
-  public void PrintSignalInfo()
+  public void PrintSignalInfoAsync()
   {
     Console.WriteLine("Signal Info:");
     Console.WriteLine();

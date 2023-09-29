@@ -19,7 +19,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
 using ZTE_Cli_Tool.DTO;
 using ZTE_Cli_Tool.Service.Interface;
 
@@ -164,17 +163,10 @@ public class ZteClient : IZteClient, IDisposable
       return null;
     }
 
-    Nv? nv = null;
-    bool error = false;
+    var nv = Tools.Deserializer<Nv>.Deserialize(json, out string errorMessage);
 
-    try {
-      nv = JsonSerializer.Deserialize<Nv>(json);
-    } catch {
-      error = true;
-    }
-
-    if (error || nv is null) {
-      _logger.LogError($"Could not deserialize Nv");
+    if (nv is null) {
+      _logger.LogError($"Could not deserialize Nv: {errorMessage}");
       return null;
     }
 
@@ -253,17 +245,15 @@ public class ZteClient : IZteClient, IDisposable
       return null;
     }
 
-    LoginResult? loginResult;
+    var loginResult = Tools.Deserializer<LoginResult>.Deserialize(resultJson, out string errorMessage);
 
-    try {
-      loginResult = JsonSerializer.Deserialize<LoginResult>(resultJson);
-      if (loginResult is null) {
-        _logger.LogError($"Could not deserialize Json: {resultJson}");
-        return null;
-      }
-      loginResult.ParseResult();
-    } catch (Exception ex) {
-      _logger.LogError($"Could not deserialize Json: {ex}");
+    if (loginResult is null) {
+      _logger.LogError($"Could not deserialize Json: {errorMessage}");
+      return null;
+    }
+
+    if (!loginResult.ParseResult()) {
+      _logger.LogError($"Could not parse login result: {loginResult.CodeAsString}");
       return null;
     }
 
@@ -279,7 +269,7 @@ public class ZteClient : IZteClient, IDisposable
     return (int)LoginResult.LoginErrorCode.LOGIN_OK;
   }
 
-  public async Task<bool> CheckLogin()
+  public async Task<bool> CheckLoginAsync()
   {
     while (!_loggedIn) {
       // For debugging purposes
@@ -338,12 +328,25 @@ public class ZteClient : IZteClient, IDisposable
     return await _zteHttpClient.ApiSetAsync(setRequest);
   }
 
-  public async Task<string?> GetSetNrBandsAsync()
+  public async Task<IEnumerable<int>?> GetSetNrBandsAsync()
   {
-    return await _zteHttpClient.ApiGetAsJsonAsync("nr5g_sa_band_lock");
+    var bandsJson = await _zteHttpClient.ApiGetAsJsonAsync("nr5g_sa_band_lock");
+
+    if (bandsJson is null) {
+      return null;
+    }
+
+    var saBandLock = Tools.Deserializer<SaBandLock>.Deserialize(bandsJson, out string errorMessage);
+
+    if (saBandLock is null) {
+      _logger.LogError($"Could not deserialize band lock Json: {errorMessage}");
+      return null;
+    }
+
+    return saBandLock.Bands.Split(',').Select(str => int.Parse(str));
   }
 
-  public async Task<bool> PerformNrBandHop(string bands1, string bands2)
+  public async Task<bool> PerformNrBandHopAsync(string bands1, string bands2)
   {
     return await SetNrBandsAsync(bands1) && await SetNrBandsAsync(bands2);
   }
@@ -357,20 +360,18 @@ public class ZteClient : IZteClient, IDisposable
       return false;
     }
 
-    DeviceInfo? DeviceInfoNew;
+    var deviceInfoNew = Tools.Deserializer<DeviceInfo>.Deserialize(json, out string errorMessage);
 
-    try {
-      DeviceInfoNew = JsonSerializer.Deserialize<DeviceInfo>(json);
-    } catch (Exception ex) {
-      _logger.LogError($"Exception: {ex}");
+    if (deviceInfoNew is null) {
+      _logger.LogError($"Could not deserialize Json: {errorMessage}");
       return false;
     }
 
-    if (DeviceInfoNew is null) {
+    if (deviceInfoNew is null) {
       return false;
     }
 
-    DeviceInfo = DeviceInfoNew;
+    DeviceInfo = deviceInfoNew;
 
     SignalInfo.Update(DeviceInfo);
 

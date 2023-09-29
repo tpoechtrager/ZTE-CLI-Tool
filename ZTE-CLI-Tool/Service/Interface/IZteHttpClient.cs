@@ -32,8 +32,9 @@ public interface IZteHttpClient : IDisposable
   /// </summary>
   /// <param name="request">The API request path.</param>
   /// <param name="post">Optional POST data for the request.</param>
+  /// <param name="hideError">Optional flag to hide error messages (default is false).</param>
   /// <returns>An <see cref="ApiResult"/> containing the response information.</returns>
-  Task<ApiResult> ApiRequestAsync(string request, Dictionary<string, string>? post = null);
+  Task<ApiResult> ApiRequestAsync(string request, Dictionary<string, string>? post = null, bool hideError = false);
 
   /// <summary>
   /// Sends an asynchronous API GET request and returns the response as a JSON string.

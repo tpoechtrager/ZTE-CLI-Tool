@@ -54,7 +54,7 @@ public class ZteHttpClient : IZteHttpClient, IDisposable
     // Try to figure out whether the router uses https or http
     _httpProtocol = "https";
 
-    if (!(await ApiRequestAsync("index.html")).success) {
+    if (!(await ApiRequestAsync("index.html", null, true)).success) {
       _httpProtocol = "http";
     }
 
@@ -79,7 +79,7 @@ public class ZteHttpClient : IZteHttpClient, IDisposable
     public string contentType = string.Empty;
   };
 
-  public async Task<ApiResult> ApiRequestAsync(string request, Dictionary<string, string>? post = null)
+  public async Task<ApiResult> ApiRequestAsync(string request, Dictionary<string, string>? post = null, bool hideError = false)
   {
     string requestAppend = string.Format("isTest=false&_={0}", DateTimeOffset.Now.ToUnixTimeMilliseconds());
 
@@ -116,10 +116,14 @@ public class ZteHttpClient : IZteHttpClient, IDisposable
 
       responseText = await httpResponseMessage.Content.ReadAsStringAsync(cts.Token);
     } catch (TaskCanceledException) {
-      _logger.LogError("Request Timeout");
+      if (!hideError) {
+        _logger.LogError("Request Timeout");
+      }
       return new ApiResult() { success = false };
     } catch (Exception ex) {
-      _logger.LogError($"Exception: {ex}");
+      if (!hideError) {
+        _logger.LogError($"Exception: {ex}");
+      }
       return new ApiResult() { success = false };
     }
 

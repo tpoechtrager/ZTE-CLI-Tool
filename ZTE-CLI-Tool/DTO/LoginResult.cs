@@ -25,10 +25,16 @@ public class LoginResult
   public string CodeAsString { get; set; } = string.Empty;
   public int Code { get; private set; } = -1;
 
-  public void ParseResult()
+  public bool ParseResult()
   {
-    Code = Tools.ParseInt(CodeAsString) ??
-      throw new Exception($"Could not parse login result! => {CodeAsString}");
+    var parsedCode = Tools.ParseInt(CodeAsString);
+
+    if (parsedCode is null) {
+      return false;
+    }
+
+    Code = parsedCode.Value;
+    return true;
   }
 
   public bool LoginSuccess()

@@ -39,6 +39,7 @@ public class ZteCliTool
     public string RouterIp { get; set; } = "192.168.0.10";
     public string RouterPassword { get; set; } = "admin1";
     public string? PerformNrBandHop { get; set; }
+    public bool PrintSetNrBands { get; set; } = false;
   }
 
   private CommandLineArgs? ParseCommandLineArgs(string[] args)
@@ -71,6 +72,9 @@ public class ZteCliTool
         case "--perform-nr-band-hop":
           parsedArgs.PerformNrBandHop = getNextArg();
           break;
+        case "--print-set-nr-bands":
+          parsedArgs.PrintSetNrBands = true;
+          break;
         default:
           _logger.LogError("Unknown command line argument: " + arg);
           return null;
@@ -90,16 +94,18 @@ public class ZteCliTool
   /// or null if no command has been executed.
   /// </returns>
 
-  private async Task<bool?> ExecuteCommand(IZteClient zteClient, CommandLineArgs parsedArgs)
+  private async Task<bool?> ExecuteCommandAsync(IZteClient zteClient, CommandLineArgs parsedArgs)
   {
     if (parsedArgs.PerformNrBandHop is not null) {
-      return await _command.PerformNrBandHop(zteClient, parsedArgs.PerformNrBandHop);
+      return await _command.PerformNrBandHopAsync(zteClient, parsedArgs.PerformNrBandHop);
+    } else if (parsedArgs.PrintSetNrBands) {
+      return await _command.PrintSetNrBandsAsync(zteClient);
     }
 
     return null;
   }
 
-  public async Task<int> Execute(string[] args)
+  public async Task<int> ExecuteAsync(string[] args)
   {
     Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US", false);
 
@@ -117,13 +123,13 @@ public class ZteCliTool
 
     // Perform login
 
-    if (!await _zteClient.CheckLogin()) {
+    if (!await _zteClient.CheckLoginAsync()) {
       return 1;
     }
 
     // Execute commands
 
-    bool? commandResult = await ExecuteCommand(_zteClient, parsedArgs);
+    bool? commandResult = await ExecuteCommandAsync(_zteClient, parsedArgs);
 
     if (commandResult.HasValue) {
       return commandResult.Value ? 0 : 1;
@@ -132,7 +138,7 @@ public class ZteCliTool
     // Otherwise show signal info
 
     while (true) {
-      if (!await _zteClient.CheckLogin()) {
+      if (!await _zteClient.CheckLoginAsync()) {
         break;
       }
 
@@ -143,11 +149,9 @@ public class ZteCliTool
         continue;
       }
 
-      await _zteClient.GetSetNrBandsAsync();
-
       Console.Clear();
 
-      _zteClient.SignalInfo.PrintSignalInfo();
+      _zteClient.SignalInfo.PrintSignalInfoAsync();
 
       Thread.Sleep(1000);
     }

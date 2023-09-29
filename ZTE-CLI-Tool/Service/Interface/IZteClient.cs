@@ -51,7 +51,7 @@ public interface IZteClient : IDisposable
   /// Checks if the user is logged in.
   /// </summary>
   /// <returns>True if logged in; otherwise, false.</returns>
-  Task<bool> CheckLogin();
+  Task<bool> CheckLoginAsync();
 
   /// <summary>
   /// Prevents automatic logout by performing a dummy request.
@@ -67,10 +67,10 @@ public interface IZteClient : IDisposable
   Task<bool> SetNrBandsAsync(string bands = "auto");
 
   /// <summary>
-  /// Retrieves the NR bands settings as JSON from the API.
+  /// Retrieves the NR (New Radio) bands settings from the API.
   /// </summary>
-  /// <returns>The JSON representation of NR bands settings, or null if the operation fails.</returns>
-  Task<string?> GetSetNrBandsAsync();
+  /// <returns>An IEnumerable of integers representing NR bands settings, or null if the operation fails.</returns>
+  Task<IEnumerable<int>?> GetSetNrBandsAsync();
 
   /// <summary>
   /// Performs NR band hopping by setting two sets of NR bands.
@@ -78,7 +78,7 @@ public interface IZteClient : IDisposable
   /// <param name="bands1">The first set of NR bands to set.</param>
   /// <param name="bands2">The second set of NR bands to set.</param>
   /// <returns>True if both sets of NR bands are set successfully, false otherwise.</returns>
-  Task<bool> PerformNrBandHop(string bands1, string bands2);
+  Task<bool> PerformNrBandHopAsync(string bands1, string bands2);
 
   /// <summary>
   /// Updates device information asynchronously.

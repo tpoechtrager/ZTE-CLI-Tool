@@ -26,8 +26,6 @@ public static class Program
 {
   public static async Task<int> Main(string[] args)
   {
-
-
     // Using DI
 
     var services = new ServiceCollection();
@@ -45,7 +43,7 @@ public static class Program
     var serviceProvider = services.BuildServiceProvider();
 
     var zteCliTool = serviceProvider.GetService<ZteCliTool>();
-    int result = await zteCliTool!.Execute(args);
+    int result = await zteCliTool!.ExecuteAsync(args);
 
     serviceProvider.Dispose();
 

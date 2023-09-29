@@ -41,7 +41,7 @@ public class Command
   /// True if the NR band hopping workaround is successful, false otherwise.
   /// </returns>
 
-  public async Task<bool> PerformNrBandHop(IZteClient zte_Client, string bands)
+  public async Task<bool> PerformNrBandHopAsync(IZteClient zte_Client, string bands)
   {
     string[] bandsArgs = bands.Split('|');
 
@@ -50,6 +50,31 @@ public class Command
       return false;
     }
 
-    return await zte_Client.PerformNrBandHop(bandsArgs[0], bandsArgs[1]);
+    return await zte_Client.PerformNrBandHopAsync(bandsArgs[0], bandsArgs[1]);
+  }
+
+  /// <summary>
+  /// Retrieves and prints the NR bands set on a ZTE router.
+  /// </summary>
+  /// <param name="zte_Client">The ZteClient instance to use for the operation.</param>
+  /// <remarks>
+  /// The NR bands are printed as a string joined by '+' characters.
+  /// </remarks>
+  /// <returns>
+  /// True if the NR bands are successfully retrieved and printed, false otherwise.
+  /// </returns>
+
+  public async Task<bool> PrintSetNrBandsAsync(IZteClient zte_Client)
+  {
+    var bands = await zte_Client.GetSetNrBandsAsync();
+
+    if (bands is null) {
+      _logger.LogError("Could not retrieve set NR bands!");
+      return false;
+    }
+
+    Console.WriteLine(string.Join('+', bands));
+
+    return true;
   }
 }
