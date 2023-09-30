@@ -51,6 +51,8 @@ public class ZteCliTool
     public string? SetLteBandLock { get; set; } = null;
 
     // Network
+    public bool Connect { get; set; } = false;
+    public bool Disconnect { get; set; } = false;
     public bool PrintNetworkPreference { get; set; } = false;
     public string? SetNetworkPreference { get; set; } = null;
   }
@@ -111,6 +113,14 @@ public class ZteCliTool
 
         // Network
 
+        case "--connect":
+          parsedArgs.Connect = true;
+          break;
+
+        case "--disconnect":
+          parsedArgs.Disconnect = true;
+          break;
+
         case "--print-network-preference":
           parsedArgs.PrintNetworkPreference = true;
           break;
@@ -141,7 +151,7 @@ public class ZteCliTool
   private async Task<bool?> ExecuteCommandAsync(IZteClient zteClient, CommandLineArgs parsedArgs)
   {
     if (parsedArgs.DebugCmd is not null) {
-      return await _command.DebugCmd(parsedArgs.DebugCmd);
+      return await _command.DebugCmdAsync(parsedArgs.DebugCmd);
     }
 
     // NR
@@ -164,7 +174,11 @@ public class ZteCliTool
 
     // Network
 
-    else if (parsedArgs.PrintNetworkPreference) {
+    else if (parsedArgs.Connect) {
+      return await _command.ConnectAsync();
+    } else if (parsedArgs.Disconnect) {
+      return await _command.DisconnectAsync();
+    } else if (parsedArgs.PrintNetworkPreference) {
       return await _command.PrintNetworkPreferenceAsync();
     } else if (parsedArgs.SetNetworkPreference is not null) {
       return await _command.SetNetworkPreferenceAsync(parsedArgs.SetNetworkPreference);

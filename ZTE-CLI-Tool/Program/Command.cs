@@ -33,7 +33,15 @@ public class Command
     _zteHttpClient = zteHttpClient;
   }
 
-  public async Task<bool> DebugCmd(string cmd)
+  /// <summary>
+  /// Executes a debug command and prints the result.
+  /// </summary>
+  /// <param name="cmd">The debug command to execute.</param>
+  /// <returns>
+  /// True if the debug command was executed and printed successfully; otherwise, false.
+  /// </returns>
+
+  public async Task<bool> DebugCmdAsync(string cmd)
   {
     var result = await _zteHttpClient.ApiGetAsJsonAsync(cmd);
 
@@ -45,6 +53,43 @@ public class Command
 
     return true;
   }
+
+  /// <summary>
+  /// Attempts to establish a network connection and provides status feedback.
+  /// </summary>
+  /// <returns>
+  /// True if the connection attempt was successful; otherwise, false.
+  /// </returns>
+
+  public async Task<bool> ConnectAsync()
+  {
+    if (await _zteClient.ConnectAsync()) {
+      Console.WriteLine("Connected!");
+    } else {
+      Console.Error.WriteLine("Could not connect!");
+    }
+
+    return true;
+  }
+
+  /// <summary>
+  /// Attempts to disconnect from the network and provides status feedback.
+  /// </summary>
+  /// <returns>
+  /// True if the disconnection attempt was successful; otherwise, false.
+  /// </returns>
+
+  public async Task<bool> DisconnectAsync()
+  {
+    if (await _zteClient.DisconnectAsync()) {
+      Console.WriteLine("Disconnected!");
+    } else {
+      Console.Error.WriteLine("Could not disconnect!");
+    }
+
+    return true;
+  }
+
 
   /// <summary>
   /// Retrieves and prints the set bands on a ZTE router.

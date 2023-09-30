@@ -60,6 +60,22 @@ public interface IZteClient : IDisposable
   Task PreventAutoLogoutAsync();
 
   /// <summary>
+  /// Attempts to connect to the network.
+  /// </summary>
+  /// <returns>
+  /// True if the connection attempt was successful; otherwise, false.
+  /// </returns>
+  Task<bool> ConnectAsync();
+
+  /// <summary>
+  /// Attempts to disconnect from the network.
+  /// </summary>
+  /// <returns>
+  /// True if the disconnection attempt was successful; otherwise, false.
+  /// </returns>
+  Task<bool> DisconnectAsync();
+
+  /// <summary>
   /// Retrieves the NR (New Radio) bands settings from the API.
   /// </summary>
   /// <returns>An IEnumerable of integers representing NR bands settings, or null if the operation fails.</returns>

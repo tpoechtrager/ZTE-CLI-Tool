@@ -345,6 +345,33 @@ public class ZteClient : IZteClient, IDisposable
     }
   }
 
+  public async Task<bool> ConnectAsync()
+  {
+    var setRequest = await BuildSetRequest("CONNECT_NETWORK");
+
+    if (setRequest is null) {
+      return false;
+    }
+
+    setRequest.Add("notCallback", "true");
+
+    return await _zteHttpClient.ApiSetAsJsonAsync(setRequest) is not null;
+  }
+
+  public async Task<bool> DisconnectAsync()
+  {
+    var setRequest = await BuildSetRequest("DISCONNECT_NETWORK");
+
+    if (setRequest is null) {
+      return false;
+    }
+
+    setRequest.Add("notCallback", "true");
+
+    return await _zteHttpClient.ApiSetAsJsonAsync(setRequest) is not null;
+  }
+
+
   private static class GetBandLockHelper<T>
   {
     public static async Task<string?> GetBandLockAsString(
