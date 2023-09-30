@@ -34,14 +34,14 @@ public class Command
   }
 
   /// <summary>
-  /// Executes a debug command and prints the result.
+  /// Executes a command and prints the result.
   /// </summary>
   /// <param name="cmd">The debug command to execute.</param>
   /// <returns>
   /// True if the debug command was executed and printed successfully; otherwise, false.
   /// </returns>
 
-  public async Task<bool> DebugCmdAsync(string cmd)
+  public async Task<bool> ExecuteCmdAsync(string cmd)
   {
     var result = await _zteHttpClient.ApiGetAsJsonAsync(cmd);
 

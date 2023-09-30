@@ -39,7 +39,7 @@ public class ZteCliTool
     public string RouterIp { get; set; } = "192.168.0.10";
     public string RouterPassword { get; set; } = "admin1";
 
-    public string? DebugCmd { get; set; } = null;
+    public string? ExecuteCmd { get; set; } = null;
 
     // NR
     public bool PrintSetNrBands { get; set; } = false;
@@ -86,8 +86,8 @@ public class ZteCliTool
           parsedArgs.RouterPassword = getNextArg();
           break;
 
-        case "--debug-cmd":
-          parsedArgs.DebugCmd = getNextArg();
+        case "--cmd":
+          parsedArgs.ExecuteCmd = getNextArg();
           break;
 
         // NR
@@ -150,8 +150,8 @@ public class ZteCliTool
 
   private async Task<bool?> ExecuteCommandAsync(IZteClient zteClient, CommandLineArgs parsedArgs)
   {
-    if (parsedArgs.DebugCmd is not null) {
-      return await _command.DebugCmdAsync(parsedArgs.DebugCmd);
+    if (parsedArgs.ExecuteCmd is not null) {
+      return await _command.ExecuteCmdAsync(parsedArgs.ExecuteCmd);
     }
 
     // NR
