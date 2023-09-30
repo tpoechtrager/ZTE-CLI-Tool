@@ -39,6 +39,8 @@ public class ZteCliTool
     public string RouterIp { get; set; } = "192.168.0.10";
     public string RouterPassword { get; set; } = "admin1";
 
+    public string? DebugCmd { get; set; } = null;
+
     // NR
     public bool PrintSetNrBands { get; set; } = false;
     public string? SetNrBandLock { get; set; } = null;
@@ -49,7 +51,8 @@ public class ZteCliTool
     public string? SetLteBandLock { get; set; } = null;
 
     // Network
-    public string? SetNetworkMode { get; set; } = null;
+    public bool PrintNetworkPreference { get; set; } = false;
+    public string? SetNetworkPreference { get; set; } = null;
   }
 
   private CommandLineArgs? ParseCommandLineArgs(string[] args)
@@ -81,6 +84,10 @@ public class ZteCliTool
           parsedArgs.RouterPassword = getNextArg();
           break;
 
+        case "--debug-cmd":
+          parsedArgs.DebugCmd = getNextArg();
+          break;
+
         // NR
 
         case "--print-nr-band-lock":
@@ -104,9 +111,12 @@ public class ZteCliTool
 
         // Network
 
-        case "--set-network-mode":
-        case "--set-net-mode":
-          parsedArgs.SetNetworkMode = getNextArg();
+        case "--print-network-preference":
+          parsedArgs.PrintNetworkPreference = true;
+          break;
+
+        case "--set-network-preference":
+          parsedArgs.SetNetworkPreference = getNextArg();
           break;
 
         default:
@@ -130,9 +140,13 @@ public class ZteCliTool
 
   private async Task<bool?> ExecuteCommandAsync(IZteClient zteClient, CommandLineArgs parsedArgs)
   {
+    if (parsedArgs.DebugCmd is not null) {
+      return await _command.DebugCmd(parsedArgs.DebugCmd);
+    }
+
     // NR
 
-    if (parsedArgs.PrintSetNrBands) {
+    else if (parsedArgs.PrintSetNrBands) {
       return await _command.PrintNrBandLockAsync();
     } else if (parsedArgs.SetNrBandLock is not null) {
       return await _command.SetNrBandLockAsync(parsedArgs.SetNrBandLock);
@@ -150,8 +164,10 @@ public class ZteCliTool
 
     // Network
 
-    else if (parsedArgs.SetNetworkMode is not null) {
-      return await _command.SetNetworkModeAsync(parsedArgs.SetNetworkMode);
+    else if (parsedArgs.PrintNetworkPreference) {
+      return await _command.PrintNetworkPreferenceAsync();
+    } else if (parsedArgs.SetNetworkPreference is not null) {
+      return await _command.SetNetworkPreferenceAsync(parsedArgs.SetNetworkPreference);
     }
 
     return null;

@@ -24,11 +24,26 @@ public class Command
 {
   private readonly ILogger<Command> _logger;
   private readonly IZteClient _zteClient;
+  private readonly IZteHttpClient _zteHttpClient;
 
-  public Command(ILogger<Command> logger, IZteClient zteClient)
+  public Command(ILogger<Command> logger, IZteClient zteClient, IZteHttpClient zteHttpClient)
   {
     _logger = logger;
     _zteClient = zteClient;
+    _zteHttpClient = zteHttpClient;
+  }
+
+  public async Task<bool> DebugCmd(string cmd)
+  {
+    var result = await _zteHttpClient.ApiGetAsJsonAsync(cmd);
+
+    if (result is not null) {
+      Console.WriteLine(result);
+    } else {
+      Console.Error.WriteLine("Request failed!");
+    }
+
+    return true;
   }
 
   /// <summary>
@@ -124,21 +139,39 @@ public class Command
   }
 
   /// <summary>
+  /// Retrieves and prints the network mode preference.
+  /// </summary>
+  /// <returns>
+  /// True if the network mode preference was retrieved and printed successfully; otherwise, false.
+  /// </returns>
+
+  public async Task<bool> PrintNetworkPreferenceAsync()
+  {
+    var networkPreference = await _zteClient.GetNetworkModePreference();
+
+    if (networkPreference is not null) {
+      Console.WriteLine(networkPreference);
+      return true;
+    } else {
+      Console.Error.WriteLine($"Retrieving network preference failed!");
+      return false;
+    }
+  }
+
+  /// <summary>
   /// Sets the network mode and handles the result.
   /// </summary>
   /// <param name="mode">The network mode to set.</param>
   /// <returns>True if the network mode was set successfully; otherwise, false.</returns>
 
-  public async Task<bool> SetNetworkModeAsync(string mode)
+  public async Task<bool> SetNetworkPreferenceAsync(string mode)
   {
-    if (await _zteClient.SetNetworkModeAsync(mode)) {
+    if (await _zteClient.SetNetworkPreferenceAsync(mode)) {
       Console.WriteLine($"Set network mode to {mode}!");
       return true;
     } else {
       Console.Error.WriteLine($"Setting network mode to ${mode} failed!");
       return false;
     }
-
-
   }
 }

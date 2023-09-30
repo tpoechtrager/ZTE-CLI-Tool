@@ -94,11 +94,19 @@ public interface IZteClient : IDisposable
   Task<IEnumerable<int>?> GetLteBandLockAsync();
 
   /// <summary>
+  /// This method retrieves the network mode preference.
+  /// </summary>
+  /// <returns>
+  /// A string representing the network mode preference, or null if there was an error.
+  /// </returns>
+  Task<string?> GetNetworkModePreference();
+
+  /// <summary>
   /// Sets the network mode.
   /// </summary>
   /// <param name="mode">The network mode to set.</param>
   /// <returns>True if the network mode was set successfully; otherwise, false.</returns>
-  Task<bool> SetNetworkModeAsync(string mode);
+  Task<bool> SetNetworkPreferenceAsync(string mode);
 
   /// <summary>
   /// Updates device information asynchronously.

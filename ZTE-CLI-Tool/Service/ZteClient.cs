@@ -462,9 +462,10 @@ public class ZteClient : IZteClient, IDisposable
     return await _zteHttpClient.ApiSetAsync(setRequest);
   }
 
-  // This is only used for setting the network mode
 
-  private readonly Dictionary<string, string> _networkModes = new() {
+  // This is only used for setting/getting the network preference.
+
+  private readonly Dictionary<string, string> _networkPreference = new() {
     {"2G", "Only_GSM"},
     {"2G+3G+4G", "GSM_WCDMA_LTE"},
     {"2G+4G", "GSM_AND_LTE"},
@@ -490,34 +491,68 @@ public class ZteClient : IZteClient, IDisposable
     {"SA", "Only_5G"}
   };
 
-  private string? GetNetworkModeValue(string mode)
+  private string? GetNetworkPreferenceValue(string mode, bool reverse = false)
   {
-    // Split the input mode by '+' and convert to uppercase,
-    // then sort the parts to check permutations
-    string[] modeParts = mode.ToUpper().Split('+').OrderBy(part => part).ToArray();
+    if (!reverse) {
+      // 2G -> Only_GSM
+      // Split the input mode by '+' and convert to uppercase,
+      // then sort the parts to check permutations
+      string[] modeParts = mode.ToUpper().Split('+').OrderBy(part => part).ToArray();
 
-    foreach (var entry in _networkModes) {
-      string[] entryParts = entry.Key.Split('+').OrderBy(part => part).ToArray();
+      foreach (var entry in _networkPreference) {
+        string[] entryParts = entry.Key.Split('+').OrderBy(part => part).ToArray();
 
-      // Check if the sorted parts of the input mode match the sorted parts of the dictionary key
-      if (modeParts.SequenceEqual(entryParts)) {
-        return entry.Value;
+        // Check if the sorted parts of the input mode match the sorted parts of the dictionary key
+        if (modeParts.SequenceEqual(entryParts)) {
+          return entry.Value;
+        }
+      }
+    } else {
+      // Only_GSM -> 2G
+      var val = _networkPreference.FirstOrDefault(np => np.Value == mode);
+
+      if (val.Key is not null) {
+        return val.Key;
       }
     }
 
     return null;
   }
 
-  public async Task<bool> SetNetworkModeAsync(string mode)
+  public async Task<string?> GetNetworkModePreference()
   {
-    var networkMode = GetNetworkModeValue(mode);
+    var json = await _zteHttpClient.ApiGetAsJsonAsync("net_select");
+
+    if (json is null) {
+      return null;
+    }
+
+    var netSelect = Tools.Deserializer<NetSelect>.Deserialize(json, out var errorMessage);
+
+    if (netSelect is null) {
+      _logger.LogError($"Could not deserialize Json: {errorMessage}");
+      return null;
+    }
+
+    var netModePreferance = GetNetworkPreferenceValue(netSelect.Mode, true);
+
+    if (netModePreferance is null) {
+      netModePreferance = netSelect.Mode;
+    }
+
+    return netModePreferance;
+  }
+
+  public async Task<bool> SetNetworkPreferenceAsync(string mode)
+  {
+    var networkMode = GetNetworkPreferenceValue(mode);
 
     if (networkMode is null) {
       _logger.LogError($"Invalid network mode {mode}");
 
       Console.WriteLine("Available modes:" + Environment.NewLine);
 
-      foreach (var entry in _networkModes) {
+      foreach (var entry in _networkPreference) {
         Console.WriteLine(" " + entry.Key);
       }
 
