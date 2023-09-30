@@ -55,6 +55,10 @@ public class ZteCliTool
     public bool Disconnect { get; set; } = false;
     public bool PrintNetworkPreference { get; set; } = false;
     public string? SetNetworkPreference { get; set; } = null;
+
+    // Stats
+    public bool showSignalInfo { get; set; } = false;
+    public bool showTrafficStatus { get; set; } = false;
   }
 
   private CommandLineArgs? ParseCommandLineArgs(string[] args)
@@ -129,6 +133,14 @@ public class ZteCliTool
           parsedArgs.SetNetworkPreference = getNextArg();
           break;
 
+        // Stats
+
+        case "--show-signal-info":
+        case "--stats":
+        case "--signal":
+          parsedArgs.showSignalInfo = true;
+          break;
+
         default:
           _logger.LogError($"Unknown command line argument: {arg}");
           return null;
@@ -184,6 +196,12 @@ public class ZteCliTool
       return await _command.SetNetworkPreferenceAsync(parsedArgs.SetNetworkPreference);
     }
 
+    // Stats
+
+    else if (parsedArgs.showSignalInfo) {
+      return await _command.ShowSignalInfoAsync();
+    }
+
     return null;
   }
 
@@ -217,26 +235,7 @@ public class ZteCliTool
       return commandResult.Value ? 0 : 1;
     }
 
-    // Otherwise show signal info
-
-    while (true) {
-      if (!await _zteClient.CheckLoginAsync()) {
-        break;
-      }
-
-      await _zteClient.PreventAutoLogoutAsync();
-
-      if (!await _zteClient.UpdateDeviceInfoAsync()) {
-        Thread.Sleep(1000);
-        continue;
-      }
-
-      Console.Clear();
-
-      _zteClient.SignalInfo.PrintSignalInfoAsync();
-
-      Thread.Sleep(1000);
-    }
+    Console.Error.WriteLine("No command given!");
 
     return 1;
   }

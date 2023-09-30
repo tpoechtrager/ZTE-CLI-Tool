@@ -30,11 +30,6 @@ public interface IZteClient : IDisposable
   DeviceInfo DeviceInfo { get; }
 
   /// <summary>
-  /// Gets signal information.
-  /// </summary>
-  SignalInfo.SignalInfo SignalInfo { get; }
-
-  /// <summary>
   /// Initializes the ZteClient service.
   /// </summary>
   /// <param name="routerIpAddress">The IP address of the router.</param>
@@ -65,7 +60,7 @@ public interface IZteClient : IDisposable
   /// <returns>
   /// True if the connection attempt was successful; otherwise, false.
   /// </returns>
-  Task<bool> ConnectAsync();
+  Task<bool> ConnectAsync(bool disconnect = false);
 
   /// <summary>
   /// Attempts to disconnect from the network.

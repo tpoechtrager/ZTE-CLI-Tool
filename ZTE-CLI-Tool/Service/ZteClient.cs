@@ -36,7 +36,6 @@ public class ZteClient : IZteClient, IDisposable
   private int _successfulLogins = 0;
 
   public DeviceInfo DeviceInfo { get; private set; } = new();
-  public SignalInfo.SignalInfo SignalInfo { get; private set; } = new();
 
   private static readonly string DEVICE_INFO_REQUEST =
     "loginfo," +
@@ -345,9 +344,9 @@ public class ZteClient : IZteClient, IDisposable
     }
   }
 
-  public async Task<bool> ConnectAsync()
+  public async Task<bool> ConnectAsync(bool disconnect = false)
   {
-    var setRequest = await BuildSetRequest("CONNECT_NETWORK");
+    var setRequest = await BuildSetRequest(disconnect ? "DISCONNECT_NETWORK" : "CONNECT_NETWORK");
 
     if (setRequest is null) {
       return false;
@@ -360,15 +359,8 @@ public class ZteClient : IZteClient, IDisposable
 
   public async Task<bool> DisconnectAsync()
   {
-    var setRequest = await BuildSetRequest("DISCONNECT_NETWORK");
 
-    if (setRequest is null) {
-      return false;
-    }
-
-    setRequest.Add("notCallback", "true");
-
-    return await _zteHttpClient.ApiSetAsJsonAsync(setRequest) is not null;
+    return await ConnectAsync(false);
   }
 
 
@@ -621,10 +613,6 @@ public class ZteClient : IZteClient, IDisposable
 
     DeviceInfo = deviceInfoNew;
 
-    SignalInfo.Update(DeviceInfo);
-
-    // FIXME move
-    // Assume we are logged-out if this value is not set
     if (string.IsNullOrEmpty(DeviceInfo.loginfo)) {
       _loggedIn = false;
       return false;

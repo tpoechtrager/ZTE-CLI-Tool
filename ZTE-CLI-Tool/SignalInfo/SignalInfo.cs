@@ -67,9 +67,6 @@ public class ConnectionTime
   }
 }
 
-
-
-
 public class SignalInfo
 {
   public NetworkType networkType { get; } = new();
@@ -94,7 +91,7 @@ public class SignalInfo
     return true;
   }
 
-  public void PrintSignalInfoAsync()
+  public void PrintSignalInfo()
   {
     Console.WriteLine("Signal Info:");
     Console.WriteLine();

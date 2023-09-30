@@ -158,4 +158,36 @@ public static class Tools
 
     return bandList;
   }
+
+  public static string CalculateDate(int secondsToSubtract)
+  {
+    try {
+      // Get the current date and time
+      DateTime currentDate = DateTime.Now;
+
+      // Subtract the specified number of seconds
+      DateTime calculatedDate = currentDate.AddSeconds(-secondsToSubtract);
+
+      // Convert the calculated date to a string
+      string dateStr = calculatedDate.ToString("yyyy-MM-dd HH:mm:ss");
+
+      return dateStr;
+    } catch {
+      return "?";
+    }
+  }
+
+  public static string FormatBytes(long bytes)
+  {
+    string[] suffixes = { "Bytes", "KB", "MB", "GB", "TB", "PB" };
+    int index = 0;
+    double size = bytes;
+
+    while (size >= 1024 && index < suffixes.Length - 1) {
+      size /= 1024;
+      index++;
+    }
+
+    return $"{size:F2} {suffixes[index]}";
+  }
 }

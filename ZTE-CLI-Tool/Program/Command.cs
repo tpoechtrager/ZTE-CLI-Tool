@@ -16,6 +16,7 @@
  */
 
 using Microsoft.Extensions.Logging;
+using ZTE_Cli_Tool.DTO;
 using ZTE_Cli_Tool.Service.Interface;
 
 namespace ZTE_Cli_Tool.Program;
@@ -218,5 +219,48 @@ public class Command
       Console.Error.WriteLine($"Setting network mode to ${mode} failed!");
       return false;
     }
+  }
+
+  /// <summary>
+  /// This asynchronous method continuously updates and displays device statistics.
+  /// </summary>
+  /// <param name="updateStats">A function that updates statistics.</param>
+  /// <param name="printStats">An action to print the updated statistics.</param>
+  /// <param name="interval">The time interval in milliseconds between updates (default is 1000ms).</param>
+
+  private async Task<bool> ShowStatsHelperAsync(
+    Func<DeviceInfo, bool> updateStats, Action printStats, int interval = 1000)
+  {
+    while (true) {
+      if (!await _zteClient.CheckLoginAsync()) {
+        break;
+      }
+
+      await _zteClient.PreventAutoLogoutAsync();
+
+      if (!await _zteClient.UpdateDeviceInfoAsync()) {
+        Thread.Sleep(interval);
+        continue;
+      }
+
+      Console.Clear();
+
+      if (!updateStats(_zteClient.DeviceInfo)) {
+        Console.Error.WriteLine("Updating stats failed!");
+        return false;
+      }
+
+      printStats();
+
+      Thread.Sleep(interval);
+    }
+
+    return false;
+  }
+
+  public async Task<bool> ShowSignalInfoAsync()
+  {
+    SignalInfo.SignalInfo SignalInfo = new();
+    return await ShowStatsHelperAsync(SignalInfo.Update, SignalInfo.PrintSignalInfo);
   }
 }
