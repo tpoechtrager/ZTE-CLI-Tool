@@ -41,20 +41,20 @@ public class NrCellContainer : CellContainer<NrCell>
      * The API does not reset its memory correctly after switching from
      * 5G CA to 5G without CA.
      */
-    var is_ca = deviceInfo.nr5g_action_channel == deviceInfo.nr_ca_pcell_freq;
+    var is_ca = deviceInfo.Nr5gActionChannel == deviceInfo.NrCaPcellFreq;
 
     // Main cell
 
-    var _5g_rx0_rsrp = deviceInfo._5g_rx0_rsrp;
+    var _5g_rx0_rsrp = deviceInfo._5gRx0Rsrp;
 
     if (string.IsNullOrEmpty(_5g_rx0_rsrp))
-      _5g_rx0_rsrp = deviceInfo.Z5g_rsrp;
+      _5g_rx0_rsrp = deviceInfo.Z5gRsrp;
 
     Value<int> pci = new();
     Value<int> freq = new();
 
-    pci.Set(deviceInfo.nr5g_pci, SetFlag.InputIsHex);
-    freq.Set(deviceInfo.nr5g_action_channel);
+    pci.Set(deviceInfo.Nr5gPci, SetFlag.InputIsHex);
+    freq.Set(deviceInfo.Nr5gActionChannel);
 
     var cell = GetCell(pci, freq) ?? new NrCell();
 
@@ -63,10 +63,10 @@ public class NrCellContainer : CellContainer<NrCell>
     cell.freq = freq;
     cell.band.Set(
         is_ca
-            ? deviceInfo.nr_ca_pcell_band
+            ? deviceInfo.NrCaPcellBand
             : NrSigVal(
-                deviceInfo.nr5g_action_nsa_band,
-                deviceInfo.nr5g_action_band
+                deviceInfo.Nr5gActionNsaBand,
+                deviceInfo.Nr5gActionBand
             ),
         SetFlag.StripNonNumericCharacters
     );
@@ -74,29 +74,29 @@ public class NrCellContainer : CellContainer<NrCell>
       // There is a good change that deviceInfo.bandwidth
       // contains a wrong bandwidth value for NSA.
       // Therefore don't use it for NSA.
-      NrSigVal("-1", deviceInfo.bandwidth),
+      NrSigVal("-1", deviceInfo.Bandwidth),
       SetFlag.StripNonNumericCharacters
     );
     cell.rsrp1.Update(_5g_rx0_rsrp);
-    cell.rsrp2.Update(deviceInfo._5g_rx1_rsrp);
-    cell.rsrq.Update(deviceInfo.Z5g_rsrq);
-    cell.sinr.Update(deviceInfo.Z5g_SINR, new ValueRemove("-20.0", "-3276.8"));
+    cell.rsrp2.Update(deviceInfo._5gRx1Rsrp);
+    cell.rsrq.Update(deviceInfo.Z5gRsrq);
+    cell.sinr.Update(deviceInfo.Z5gSinr, new ValueRemove("-20.0", "-3276.8"));
 
     AddOrUpdateCell(cell);
 
     // SCells
 
-    if (!is_ca || string.IsNullOrEmpty(deviceInfo.nr_multi_ca_scell_info)) {
+    if (!is_ca || string.IsNullOrEmpty(deviceInfo.NrMultiCaScellInfo)) {
       RemoveOrphanedCells();
       return;
     }
 
     var allowedBands =
-      NrSigVal(deviceInfo.nr5g_nsa_band_lock, deviceInfo.nr5g_sa_band_lock)
+      NrSigVal(deviceInfo.Nr5gNsaBandLock, deviceInfo.Nr5gSaBandLock)
         .Split(",");
 
     var scellInfos =
-      deviceInfo.nr_multi_ca_scell_info.Split(';')
+      deviceInfo.NrMultiCaScellInfo.Split(';')
         .Where(s => !string.IsNullOrEmpty(s)).ToList();
 
     foreach (var scellInfo in scellInfos) {

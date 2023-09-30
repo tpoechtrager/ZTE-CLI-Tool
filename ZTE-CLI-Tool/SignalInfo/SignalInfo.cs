@@ -57,7 +57,7 @@ public class ConnectionTime
   {
     try {
       connectTime = DateTime.ParseExact(
-          deviceInfo.ppp_connect_time,
+          deviceInfo.PppConnectTime,
           "yyyy-MM-dd'T'HH:mm:ss'Z'",
           CultureInfo.InvariantCulture
       );

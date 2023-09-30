@@ -84,7 +84,7 @@ public class NetworkType
 
   public void Update(DeviceInfo deviceInfo)
   {
-    var network_type = deviceInfo.network_type;
+    var network_type = deviceInfo.NetworkType;
 
     if (UMTS_NAMES.Contains(network_type)) {
       type = Type.UMTS;
@@ -92,8 +92,8 @@ public class NetworkType
     }
 
     if (LTE_NAMES.Contains(network_type)) {
-      if (!string.IsNullOrEmpty(deviceInfo.wan_lte_ca) &&
-        (deviceInfo.wan_lte_ca == "ca_activated" || deviceInfo.wan_lte_ca == "ca_deactivated")) {
+      if (!string.IsNullOrEmpty(deviceInfo.WanLteCa) &&
+        (deviceInfo.WanLteCa == "ca_activated" || deviceInfo.WanLteCa == "ca_deactivated")) {
         type = Type.LTE_PLUS;
       } else {
         type = Type.LTE;

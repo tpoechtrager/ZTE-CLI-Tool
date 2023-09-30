@@ -26,7 +26,7 @@ public class LteCellContainer : CellContainer<LteCell>
 
   public void Update(NetworkType _, in DeviceInfo deviceInfo)
   {
-    tx_power.Update(deviceInfo.tx_power);
+    tx_power.Update(deviceInfo.TxPower);
 
     /*
      * Main Cell
@@ -35,29 +35,29 @@ public class LteCellContainer : CellContainer<LteCell>
     Value<int> pci = new();
     Value<int> freq = new();
 
-    pci.Set(deviceInfo.lte_pci, SetFlag.InputIsHex);
-    freq.Set(OneOf(deviceInfo.wan_active_band, deviceInfo.lte_ca_pcell_freq));
+    pci.Set(deviceInfo.LtePci, SetFlag.InputIsHex);
+    freq.Set(OneOf(deviceInfo.WanActiveBand, deviceInfo.LteCaPcellFreq));
 
     var cell = GetCell(pci, freq) ?? new();
 
     cell.pci = pci;
     cell.freq = freq;
-    cell.band.Set(OneOf(deviceInfo.lte_ca_pcell_band, deviceInfo.lte_band));
+    cell.band.Set(OneOf(deviceInfo.LteCaPcellBand, deviceInfo.LteBand));
 
     cell.bandwidth
-      .Set(OneOf(deviceInfo.lte_ca_pcell_bandwidth, deviceInfo.bandwidth),
+      .Set(OneOf(deviceInfo.LteCaPcellBandwidth, deviceInfo.Bandwidth),
            new ValueRemove("MHz"));
 
-    cell.rssi.Update(deviceInfo.lte_rssi);
-    cell.rsrp1.Update(deviceInfo.lte_rsrp_1);
-    cell.rsrp2.Update(deviceInfo.lte_rsrp_2);
-    cell.rsrp3.Update(deviceInfo.lte_rsrp_3);
-    cell.rsrp4.Update(deviceInfo.lte_rsrp_4);
-    cell.rsrq.Update(deviceInfo.lte_rsrq);
-    cell.sinr1.Update(deviceInfo.lte_snr_1);
-    cell.sinr2.Update(deviceInfo.lte_snr_2);
-    cell.sinr3.Update(deviceInfo.lte_snr_3);
-    cell.sinr4.Update(deviceInfo.lte_snr_4);
+    cell.rssi.Update(deviceInfo.LteRssi);
+    cell.rsrp1.Update(deviceInfo.LteRsrp1);
+    cell.rsrp2.Update(deviceInfo.LteRsrp2);
+    cell.rsrp3.Update(deviceInfo.LteRsrp3);
+    cell.rsrp4.Update(deviceInfo.LteRsrp4);
+    cell.rsrq.Update(deviceInfo.LteRsrq);
+    cell.sinr1.Update(deviceInfo.LteSnr1);
+    cell.sinr2.Update(deviceInfo.LteSnr2);
+    cell.sinr3.Update(deviceInfo.LteSnr3);
+    cell.sinr4.Update(deviceInfo.LteSnr4);
 
     AddOrUpdateCell(cell);
 
@@ -65,15 +65,15 @@ public class LteCellContainer : CellContainer<LteCell>
      * SCells
      */
 
-    if (string.IsNullOrEmpty(deviceInfo.lte_multi_ca_scell_info)) {
+    if (string.IsNullOrEmpty(deviceInfo.LteMultiCaScellInfo)) {
       RemoveOrphanedCells();
       return;
     }
 
-    var scellInfos = deviceInfo.lte_multi_ca_scell_info.Split(';')
+    var scellInfos = deviceInfo.LteMultiCaScellInfo.Split(';')
       .Where(s => !string.IsNullOrEmpty(s)).ToList();
 
-    var scellSigInfos = deviceInfo.lte_multi_ca_scell_sig_info.Split(';')
+    var scellSigInfos = deviceInfo.LteMultiCaSellSigInfo.Split(';')
       .Where(s => !string.IsNullOrEmpty(s)).ToList();
 
     for (int i = 0; i < scellInfos.Count; i++) {

@@ -37,43 +37,44 @@ public class ZteClient : IZteClient, IDisposable
 
   public DeviceInfo DeviceInfo { get; private set; } = new();
 
-  private static readonly string DEVICE_INFO_REQUEST =
-    "loginfo," +
-
-    "wan_active_band,wan_active_channel,wan_lte_ca,wan_apn,wan_ipaddr," +
-    "cell_id,dns_mode,prefer_dns_manual,standby_dns_manual,network_type," +
-    "network_provider_fullname," +
-
-    "ppp_connect_time," +
-
-    "rmcc,rmnc,nas_rrc_state" +
-
-    "ip_passthrough_enabled," +
-
+  private const string DEVICE_INFO_REQUEST =
+    "5g_rx0_rsrp,5g_rx1_rsrp,Z5g_SINR,Z5g_rsrp,Z5g_rsrq," +
     "bandwidth," +
-    "tx_power," +
-
-    "rscp_1,ecio_1,rscp_2,ecio_2,rscp_3,ecio_3,rscp_4,ecio_4," +
-
-    "ngbr_cell_info," +
-    "lte_multi_ca_scell_info,lte_multi_ca_scell_sig_info," +
-    "lte_band,lte_rsrp,lte_rsrq," +
-    "lte_rsrq,lte_rssi,lte_rsrp,lte_snr," +
-    "lte_ca_pcell_band,lte_ca_pcell_freq,lte_ca_pcell_bandwidth," +
+    "cell_id," +
+    "dns_mode," +
+    "ecio_1,ecio_2,ecio_3,ecio_4," +
+    "ip_passthrough_enabled," +
+    "loginfo," +
+    "lte_band,lte_ca_pcell_band,lte_ca_pcell_bandwidth,lte_ca_pcell_freq," +
     "lte_ca_scell_band,lte_ca_scell_bandwidth," +
-    "lte_rsrp_1,lte_rsrp_2,lte_rsrp_3,lte_rsrp_4," +
-    "lte_snr_1,lte_snr_2,lte_snr_3,lte_snr_4," +
-    "lte_pci,lte_pci_lock,lte_earfcn_lock," +
-
-    "5g_rx0_rsrp,5g_rx1_rsrp,Z5g_rsrp,Z5g_rsrq,Z5g_SINR," +
-    "nr5g_cell_id,nr5g_pci," +
-    "nr5g_action_channel,nr5g_action_band," +
-    "nr5g_action_nsa_band," +
-    "nr_ca_pcell_band,nr_ca_pcell_freq," +
-    "nr_multi_ca_scell_info," +
-    "nr5g_sa_band_lock,nr5g_nsa_band_lock," +
-
-    "pm_sensor_ambient,pm_sensor_mdm,pm_sensor_5g,pm_sensor_pa1,wifi_chip_temp";
+    "lte_earfcn_lock,lte_multi_ca_scell_info,lte_multi_ca_scell_sig_info," +
+    "lte_pci,lte_pci_lock," +
+    "lte_rsrp,lte_rsrp_1,lte_rsrp_2,lte_rsrp_3,lte_rsrp_4," +
+    "lte_rsrq,lte_rssi,lte_snr,lte_snr_1,lte_snr_2,lte_snr_3,lte_snr_4," +
+    "monthly_drop_rx_packets,monthly_rx_bytes,monthly_rx_packets," +
+    "nas_rrc_state," +
+    "network_provider_fullname,network_type," +
+    "ngbr_cell_info," +
+    "nr5g_action_band,nr5g_action_channel,nr5g_action_nsa_band," +
+    "nr5g_cell_id,nr5g_nsa_band_lock,nr5g_pci,nr5g_sa_band_lock," +
+    "nr_ca_pcell_band,nr_ca_pcell_freq,nr_multi_ca_scell_info," +
+    "peak_rx_bytes," +
+    "pm_sensor_5g,pm_sensor_ambient,pm_sensor_mdm,pm_sensor_pa1," +
+    "ppp_connect_time," +
+    "prefer_dns_manual," +
+    "realtime_drop_rx_packets,realtime_rx_bytes,realtime_rx_packets,realtime_rx_thrpt," +
+    "rmcc,rmnc," +
+    "rscp_1,rscp_2,rscp_3,rscp_4," +
+    "standby_dns_manual," +
+    "total_drop_rx_packets,total_rx_bytes,total_rx_packets," +
+    "traffic_month_home_drop_rx_packets,traffic_month_home_rx_packets," +
+    "traffic_month_internal_drop_rx_packets,traffic_month_internal_rx_packets," +
+    "traffic_month_roam_drop_rx_packets,traffic_month_roam_rx_packets," +
+    "traffic_total_home_drop_rx_packets,traffic_total_home_rx_packets," +
+    "traffic_total_internal_drop_rx_packets,traffic_total_roam_drop_rx_packets,traffic_total_roam_rx_packets," +
+    "tx_power," +
+    "wan_active_band,wan_active_channel,wan_apn,wan_curr_rx_bytes,wan_ipaddr,wan_lte_ca," +
+    "wifi_chip_temp";
 
   public ZteClient(ILogger<ZteClient> logger, IZteHttpClient zteHttpClient)
   {
@@ -613,7 +614,7 @@ public class ZteClient : IZteClient, IDisposable
 
     DeviceInfo = deviceInfoNew;
 
-    if (string.IsNullOrEmpty(DeviceInfo.loginfo)) {
+    if (string.IsNullOrEmpty(DeviceInfo.LogInfo)) {
       _loggedIn = false;
       return false;
     }

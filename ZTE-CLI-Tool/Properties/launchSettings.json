@@ -2,7 +2,7 @@
   "profiles": {
     "ZTE-Cli-Tool": {
       "commandName": "Project",
-      "commandLineArgs": "--print-lte-band-lock\r\n"
+      "commandLineArgs": "--stats\r\n"
     }
   }
 }

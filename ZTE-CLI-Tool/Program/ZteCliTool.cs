@@ -57,7 +57,7 @@ public class ZteCliTool
     public string? SetNetworkPreference { get; set; } = null;
 
     // Stats
-    public bool showSignalInfo { get; set; } = false;
+    public bool showSignalInfo { get; set; } = true;
     public bool showTrafficStatus { get; set; } = false;
   }
 
