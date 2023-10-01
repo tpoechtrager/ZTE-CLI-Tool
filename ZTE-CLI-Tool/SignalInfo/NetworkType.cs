@@ -59,27 +59,27 @@ public class NetworkType
     "SA"
   };
 
-  private Type type = Type.UNKNOWN;
+  private Type _type = Type.UNKNOWN;
 
-  public string AsString => TYPE_NAMES[(int)type];
+  public string AsString => TYPE_NAMES[(int)_type];
 
   public bool IsUmts =>
-    type == Type.UMTS;
+    _type == Type.UMTS;
 
   public bool IsLte =>
-    type == Type.LTE || type == Type.LTE_PLUS || IsNrNsa;
+    _type == Type.LTE || _type == Type.LTE_PLUS || IsNrNsa;
 
   public bool IsNr =>
   IsNrNsa || IsNrSa;
 
   public bool IsNrNsa =>
-    type == Type.NR_NSA_PASSIVE || type == Type.NR_NSA_ACTIVE;
+    _type == Type.NR_NSA_PASSIVE || _type == Type.NR_NSA_ACTIVE;
 
   public bool IsNrNsaActive =>
-    type == Type.NR_NSA_ACTIVE;
+    _type == Type.NR_NSA_ACTIVE;
 
   public bool IsNrSa =>
-    type == Type.NR_SA;
+    _type == Type.NR_SA;
 
 
   public void Update(DeviceInfo deviceInfo)
@@ -87,16 +87,16 @@ public class NetworkType
     var network_type = deviceInfo.NetworkType;
 
     if (UMTS_NAMES.Contains(network_type)) {
-      type = Type.UMTS;
+      _type = Type.UMTS;
       return;
     }
 
     if (LTE_NAMES.Contains(network_type)) {
       if (!string.IsNullOrEmpty(deviceInfo.WanLteCa) &&
         (deviceInfo.WanLteCa == "ca_activated" || deviceInfo.WanLteCa == "ca_deactivated")) {
-        type = Type.LTE_PLUS;
+        _type = Type.LTE_PLUS;
       } else {
-        type = Type.LTE;
+        _type = Type.LTE;
       }
 
       return;
@@ -104,19 +104,19 @@ public class NetworkType
 
     if (NR_NSA_NAMES.Contains(network_type)) {
       if (network_type == "LTE-NSA") {
-        type = Type.NR_NSA_PASSIVE;
+        _type = Type.NR_NSA_PASSIVE;
       } else {
-        type = Type.NR_NSA_ACTIVE;
+        _type = Type.NR_NSA_ACTIVE;
       }
 
       return;
     }
 
     if (NR_SA_NAMES.Contains(network_type)) {
-      type = Type.NR_SA;
+      _type = Type.NR_SA;
       return;
     }
 
-    type = Type.UNKNOWN;
+    _type = Type.UNKNOWN;
   }
 };

@@ -22,11 +22,11 @@ using static ZTE_Cli_Tool.Tools;
 
 public class LteCellContainer : CellContainer<LteCell>
 {
-  public SignalValue<int> tx_power { get; } = new();
+  public SignalValue<int> TxPower { get; } = new();
 
   public void Update(NetworkType _, in DeviceInfo deviceInfo)
   {
-    tx_power.Update(deviceInfo.TxPower);
+    TxPower.Update(deviceInfo.TxPower);
 
     /*
      * Main Cell
@@ -40,24 +40,24 @@ public class LteCellContainer : CellContainer<LteCell>
 
     var cell = GetCell(pci, freq) ?? new();
 
-    cell.pci = pci;
-    cell.freq = freq;
-    cell.band.Set(OneOf(deviceInfo.LteCaPcellBand, deviceInfo.LteBand));
+    cell.Pci = pci;
+    cell.Freq = freq;
+    cell.Band.Set(OneOf(deviceInfo.LteCaPcellBand, deviceInfo.LteBand));
 
-    cell.bandwidth
+    cell.Bandwidth
       .Set(OneOf(deviceInfo.LteCaPcellBandwidth, deviceInfo.Bandwidth),
            new ValueRemove("MHz"));
 
-    cell.rssi.Update(deviceInfo.LteRssi);
-    cell.rsrp1.Update(deviceInfo.LteRsrp1);
-    cell.rsrp2.Update(deviceInfo.LteRsrp2);
-    cell.rsrp3.Update(deviceInfo.LteRsrp3);
-    cell.rsrp4.Update(deviceInfo.LteRsrp4);
-    cell.rsrq.Update(deviceInfo.LteRsrq);
-    cell.sinr1.Update(deviceInfo.LteSnr1);
-    cell.sinr2.Update(deviceInfo.LteSnr2);
-    cell.sinr3.Update(deviceInfo.LteSnr3);
-    cell.sinr4.Update(deviceInfo.LteSnr4);
+    cell.Rssi.Update(deviceInfo.LteRssi);
+    cell.Rsrp1.Update(deviceInfo.LteRsrp1);
+    cell.Rsrp2.Update(deviceInfo.LteRsrp2);
+    cell.Rsrp3.Update(deviceInfo.LteRsrp3);
+    cell.Rsrp4.Update(deviceInfo.LteRsrp4);
+    cell.Rsrq.Update(deviceInfo.LteRsrq);
+    cell.Sinr1.Update(deviceInfo.LteSnr1);
+    cell.Sinr2.Update(deviceInfo.LteSnr2);
+    cell.Sinr3.Update(deviceInfo.LteSnr3);
+    cell.Sinr4.Update(deviceInfo.LteSnr4);
 
     AddOrUpdateCell(cell);
 
@@ -90,21 +90,21 @@ public class LteCellContainer : CellContainer<LteCell>
 
       var scell = GetCell(pci, freq) ?? new LteCell();
 
-      scell.scell.Set(true);
-      scell.pci = pci;
-      scell.freq = freq;
+      scell.Scell.Set(true);
+      scell.Pci = pci;
+      scell.Freq = freq;
 
-      scell.band.Set(scellInfo[3]);
-      scell.bandwidth.Set(scellInfo[5]);
+      scell.Band.Set(scellInfo[3]);
+      scell.Bandwidth.Set(scellInfo[5]);
 
       if (i < scellSigInfos.Count) {
         var scellSigInfo = scellSigInfos[i].Split(',');
 
         if (scellSigInfo.Length >= 3) {
-          scell.rsrp1.Update(scellSigInfo[0], new ValueRemove("0.0", "-44.0"));
-          scell.rsrq.Update(scellSigInfo[1], new ValueRemove("0.0"));
+          scell.Rsrp1.Update(scellSigInfo[0], new ValueRemove("0.0", "-44.0"));
+          scell.Rsrq.Update(scellSigInfo[1], new ValueRemove("0.0"));
           // In theory, 0.0 could be a valid SINR value
-          scell.sinr1.Update(scellSigInfo[2], new ValueRemove("0.0"));
+          scell.Sinr1.Update(scellSigInfo[2], new ValueRemove("0.0"));
         }
       }
 

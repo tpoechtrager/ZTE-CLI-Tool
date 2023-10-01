@@ -222,7 +222,7 @@ public class Command
   }
 
   /// <summary>
-  /// This asynchronous method continuously updates and displays device statistics.
+  /// This method continuously updates and displays device statistics.
   /// </summary>
   /// <param name="updateStats">A function that updates statistics.</param>
   /// <param name="printStats">An action to print the updated statistics.</param>

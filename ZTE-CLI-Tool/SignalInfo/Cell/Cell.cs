@@ -19,16 +19,16 @@ namespace ZTE_Cli_Tool;
 
 public class Cell : CellIdentifier
 {
-  public Value<int> band = new();
-  public Value<float> bandwidth = new();
-  public Value<bool> scell = new();
+  public Value<int> Band = new();
+  public Value<float> Bandwidth = new();
+  public Value<bool> Scell = new();
 
-  public bool IsPrimaryCell => scell == false;
-  public bool IsSecondaryCell => scell == false;
+  public bool IsPrimaryCell => Scell == false;
+  public bool IsSecondaryCell => Scell == false;
 
   public static bool operator ==(Cell a, Cell b)
   {
-    return a.pci == b.pci && a.freq == b.freq;
+    return a.Pci == b.Pci && a.Freq == b.Freq;
   }
 
   public static bool operator !=(Cell a, Cell b)
@@ -38,7 +38,7 @@ public class Cell : CellIdentifier
 
   public override int GetHashCode()
   {
-    return pci.GetHashCode() ^ freq.GetHashCode();
+    return Pci.GetHashCode() ^ Freq.GetHashCode();
   }
 
   public override bool Equals(object? inVal)
@@ -48,7 +48,7 @@ public class Cell : CellIdentifier
     }
 
     if (inVal is Cell inCell) {
-      return pci == inCell.pci && freq == inCell.freq;
+      return Pci == inCell.Pci && Freq == inCell.Freq;
     }
 
     return false;

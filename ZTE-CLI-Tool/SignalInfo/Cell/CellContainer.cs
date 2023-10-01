@@ -19,52 +19,48 @@ namespace ZTE_Cli_Tool;
 
 public class CellContainer<T> where T : Cell
 {
-  public List<T> cells { get; private set; } = new();
-  private List<CellIdentifier> nonOrphanedCells = new();
+  public List<T> Cells { get; private set; } = new();
+  private List<CellIdentifier> _nonOrphanedCells = new();
 
   public T? GetCell(Value<int> pci, Value<int> freq)
   {
-    int index = cells.FindIndex(c => (c as Cell)!.pci == pci &&
-                                     (c as Cell)!.freq == freq);
+    int index = Cells.FindIndex(c => (c as Cell)!.Pci == pci &&
+                                     (c as Cell)!.Freq == freq);
 
     if (index == -1) {
       return default;
     }
 
-    T cell = cells[index];
-    nonOrphanedCells.Add(cell);
+    T cell = Cells[index];
+    _nonOrphanedCells.Add(cell);
     return cell;
   }
 
   public void AddOrUpdateCell(T cell)
   {
-    int index = cells.FindIndex(c => (c as Cell)!.pci == (cell as Cell)!.pci &&
-                                     (c as Cell)!.freq == (cell as Cell)!.freq);
+    int index = Cells.FindIndex(c => (c as Cell)!.Pci == (cell as Cell)!.Pci &&
+                                     (c as Cell)!.Freq == (cell as Cell)!.Freq);
 
-    nonOrphanedCells.Add(cell);
+    _nonOrphanedCells.Add(cell);
 
     if (index != -1) {
-      cells[index] = cell;
+      Cells[index] = cell;
       return;
     }
 
-    cells.Add(cell);
-  }
-
-  public void CellUpdateStart()
-  {
+    Cells.Add(cell);
   }
 
   // Removes orphaned cells
   public void RemoveOrphanedCells()
   {
-    for (int i = cells.Count - 1; i >= 0; i--) {
-      var cell = cells[i];
-      if (!nonOrphanedCells.Contains(cell)) {
-        cells.Remove(cell);
+    for (int i = Cells.Count - 1; i >= 0; i--) {
+      var cell = Cells[i];
+      if (!_nonOrphanedCells.Contains(cell)) {
+        Cells.Remove(cell);
       }
     }
 
-    nonOrphanedCells.Clear();
+    _nonOrphanedCells.Clear();
   }
 }

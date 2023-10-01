@@ -69,23 +69,23 @@ public class ConnectionTime
 
 public class SignalInfo
 {
-  public NetworkType networkType { get; } = new();
-  public ConnectionTime connectionTime { get; } = new();
+  public NetworkType NetworkType { get; } = new();
+  public ConnectionTime ConnectionTime { get; } = new();
 
-  public LteCellContainer lte { get; } = new();
-  public NrCellContainer nr { get; } = new();
+  public LteCellContainer Lte { get; } = new();
+  public NrCellContainer Nr { get; } = new();
 
   public bool Update(DeviceInfo deviceInfo)
   {
-    networkType.Update(deviceInfo);
-    connectionTime.Update(deviceInfo);
+    NetworkType.Update(deviceInfo);
+    ConnectionTime.Update(deviceInfo);
 
-    if (networkType.IsLte) {
-      lte.Update(networkType, deviceInfo);
+    if (NetworkType.IsLte) {
+      Lte.Update(NetworkType, deviceInfo);
     }
 
-    if (networkType.IsNr) {
-      nr.Update(networkType, deviceInfo);
+    if (NetworkType.IsNr) {
+      Nr.Update(NetworkType, deviceInfo);
     }
 
     return true;
@@ -96,7 +96,7 @@ public class SignalInfo
     Console.WriteLine("Signal Info:");
     Console.WriteLine();
     Console.WriteLine("Network Type: {0}  Time Connected: {1}",
-        networkType.AsString, connectionTime.timeConnected);
+        NetworkType.AsString, ConnectionTime.timeConnected);
 
     string bandsString = string.Join(" + ", GetBands());
     float totalBandwidth = GetTotalBandwidth();
@@ -105,59 +105,59 @@ public class SignalInfo
     Console.WriteLine("Bands: {0}{1}", bandsString, totalBandwidthString);
     Console.WriteLine();
 
-    if (networkType.IsLte) {
+    if (NetworkType.IsLte) {
       Console.WriteLine("LTE Signal:");
       Console.WriteLine();
 
-      foreach (var cell in lte.cells) {
+      foreach (var cell in Lte.Cells) {
         string cellPrefix = cell.IsPrimaryCell ? "P" : "S";
-        string bandwidthString = cell.bandwidth.Get() > -1 ? $" ({cell.bandwidth.Get()} MHz)" : "";
+        string bandwidthString = cell.Bandwidth.Get() > -1 ? $" ({cell.Bandwidth.Get()} MHz)" : "";
 
         Console.WriteLine("-- {0}Cell: B{1} - {2} / {3}{4} --",
-            cellPrefix, cell.band.Get(), cell.pci.Get(), cell.earfcn.Get(), bandwidthString);
+            cellPrefix, cell.Band.Get(), cell.Pci.Get(), cell.Earfcn.Get(), bandwidthString);
 
-        PrintSignalValue(cell.IsPrimaryCell ? "RSRP1" : "RSRP", cell.rsrp1, "dBm");
+        PrintSignalValue(cell.IsPrimaryCell ? "RSRP1" : "RSRP", cell.Rsrp1, "dBm");
 
         if (cell.IsPrimaryCell) {
-          PrintSignalValue("RSRP2", cell.rsrp2, "dBm");
-          PrintSignalValue("RSRP3", cell.rsrp3, "dBm");
-          PrintSignalValue("RSRP4", cell.rsrp4, "dBm");
+          PrintSignalValue("RSRP2", cell.Rsrp2, "dBm");
+          PrintSignalValue("RSRP3", cell.Rsrp3, "dBm");
+          PrintSignalValue("RSRP4", cell.Rsrp4, "dBm");
         }
 
-        PrintSignalValue("RSRQ", cell.rsrq, "dB");
-        PrintSignalValue(cell.IsPrimaryCell ? "SINR1" : "SINR", cell.sinr1, "dB");
+        PrintSignalValue("RSRQ", cell.Rsrq, "dB");
+        PrintSignalValue(cell.IsPrimaryCell ? "SINR1" : "SINR", cell.Sinr1, "dB");
 
         if (cell.IsPrimaryCell) {
-          PrintSignalValue("SINR2", cell.sinr2, "dB");
-          PrintSignalValue("SINR3", cell.sinr3, "dB");
-          PrintSignalValue("SINR4", cell.sinr4, "dB");
+          PrintSignalValue("SINR2", cell.Sinr2, "dB");
+          PrintSignalValue("SINR3", cell.Sinr3, "dB");
+          PrintSignalValue("SINR4", cell.Sinr4, "dB");
         }
 
         Console.WriteLine();
       }
     }
 
-    if (networkType.IsNr) {
+    if (NetworkType.IsNr) {
       Console.WriteLine("NR Signal:");
       Console.WriteLine();
 
-      foreach (var cell in nr.cells) {
-        string cellPrefix = networkType.IsNrNsa ? "S" : (cell.IsPrimaryCell ? "P" : "S");
-        string bandwidthString = cell.bandwidth.Get() > -1 ? $" ({cell.bandwidth.Get()} MHz)" : "";
+      foreach (var cell in Nr.Cells) {
+        string cellPrefix = NetworkType.IsNrNsa ? "S" : (cell.IsPrimaryCell ? "P" : "S");
+        string bandwidthString = cell.Bandwidth.Get() > -1 ? $" ({cell.Bandwidth.Get()} MHz)" : "";
 
         Console.WriteLine("-- {0}Cell: n{1} - {2} / {3}{4} --",
-            cellPrefix, cell.band.Get(), cell.pci.Get(), cell.arfcn.Get(), bandwidthString);
+            cellPrefix, cell.Band.Get(), cell.Pci.Get(), cell.Arfcn.Get(), bandwidthString);
 
-        PrintSignalValue(cell.rsrp2.Ok ? "RSRP1" : "RSRP", cell.rsrp1, "dBm");
-        if (cell.rsrp2.Ok)
-          PrintSignalValue("RSRP2", cell.rsrp2, "dBm");
-        PrintSignalValue("SINR", cell.sinr, "dB");
+        PrintSignalValue(cell.Rsrp2.Ok ? "RSRP1" : "RSRP", cell.Rsrp1, "dBm");
+        if (cell.Rsrp2.Ok)
+          PrintSignalValue("RSRP2", cell.Rsrp2, "dBm");
+        PrintSignalValue("SINR", cell.Sinr, "dB");
 
         Console.WriteLine();
       }
     }
 
-    if (networkType.IsUmts) {
+    if (NetworkType.IsUmts) {
       Console.WriteLine("UMTS Signal:");
       Console.WriteLine("- Not implemented -");
     }
@@ -178,9 +178,9 @@ public class SignalInfo
     float totalBandwidth = 0;
     bool hasUndefinedBandwidth = false;
 
-    if (networkType.IsLte) {
-      foreach (var cell in lte.cells) {
-        float bandwidth = cell.bandwidth.Get();
+    if (NetworkType.IsLte) {
+      foreach (var cell in Lte.Cells) {
+        float bandwidth = cell.Bandwidth.Get();
         if (bandwidth == -1) {
           hasUndefinedBandwidth = true;
         } else {
@@ -189,9 +189,9 @@ public class SignalInfo
       }
     }
 
-    if (networkType.IsNr) {
-      foreach (var cell in nr.cells) {
-        float bandwidth = cell.bandwidth.Get();
+    if (NetworkType.IsNr) {
+      foreach (var cell in Nr.Cells) {
+        float bandwidth = cell.Bandwidth.Get();
         if (bandwidth == -1) {
           hasUndefinedBandwidth = true;
         } else {
@@ -205,10 +205,10 @@ public class SignalInfo
 
   private IEnumerable<string> GetBands()
   {
-    if (networkType.IsLte) {
-      foreach (var cell in lte.cells) {
-        float bandwidth = cell.bandwidth.Get();
-        string bandString = string.Format("B{0}", cell.band.Val);
+    if (NetworkType.IsLte) {
+      foreach (var cell in Lte.Cells) {
+        float bandwidth = cell.Bandwidth.Get();
+        string bandString = string.Format("B{0}", cell.Band.Val);
         if (bandwidth > -1) {
           bandString += string.Format(" ({0} MHz)", bandwidth);
         }
@@ -216,10 +216,10 @@ public class SignalInfo
       }
     }
 
-    if (networkType.IsNr) {
-      foreach (var cell in nr.cells) {
-        float bandwidth = cell.bandwidth.Get();
-        string bandString = string.Format("n{0}", cell.band.Val);
+    if (NetworkType.IsNr) {
+      foreach (var cell in Nr.Cells) {
+        float bandwidth = cell.Bandwidth.Get();
+        string bandString = string.Format("n{0}", cell.Band.Val);
         if (bandwidth > -1) {
           bandString += string.Format(" ({0} MHz)", bandwidth);
         }

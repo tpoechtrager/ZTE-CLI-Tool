@@ -26,13 +26,13 @@ public enum SetFlag
 
 class ValueReplace
 {
-  public string find;
-  public string replacement;
+  public string Find;
+  public string Replacement;
 
   public ValueReplace(string find, string replacement)
   {
-    this.find = find;
-    this.replacement = replacement;
+    Find = find;
+    Replacement = replacement;
   }
 }
 
@@ -48,12 +48,12 @@ class ValueRemove
 
 public class Value<T> where T : notnull
 {
-  public int updates { get; private set; } = 0;
-  private T val = default!;
+  public int Updates { get; private set; } = 0;
+  private T _val = default!;
 
-  public T Get() => val;
-  public T Val => val;
-  public bool Ok => updates > 0;
+  public T Get() => _val;
+  public T Val => _val;
+  public bool Ok => Updates > 0;
 
   public static bool operator >(Value<T> a, object b)
   {
@@ -83,7 +83,7 @@ public class Value<T> where T : notnull
 
   public static bool operator ==(Value<T> a, object b)
   {
-    return a.val.Equals(b);
+    return a._val.Equals(b);
   }
 
   public static bool operator !=(Value<T> a, object b)
@@ -93,7 +93,7 @@ public class Value<T> where T : notnull
 
   public static bool operator ==(Value<T> a, Value<T> b)
   {
-    return a.val.Equals(b.val);
+    return a._val.Equals(b._val);
   }
 
   public static bool operator !=(Value<T> a, Value<T> b)
@@ -103,16 +103,16 @@ public class Value<T> where T : notnull
 
   public override bool Equals(object? inVal)
   {
-    if (inVal is null || val.GetType() != inVal.GetType()) {
+    if (inVal is null || _val.GetType() != inVal.GetType()) {
       return false;
     }
 
-    return val.Equals(inVal);
+    return _val.Equals(inVal);
   }
 
   public override int GetHashCode()
   {
-    return val.GetHashCode();
+    return _val.GetHashCode();
   }
 
   public bool Set(string strValue, params object[] options)
@@ -137,7 +137,7 @@ public class Value<T> where T : notnull
         }
       } else if (option is ValueReplace replaceValue) {
         strValue = strValue.Replace(
-          replaceValue.find, replaceValue.replacement);
+          replaceValue.Find, replaceValue.Replacement);
       } else if (option is SetFlag setFlags) {
         flags |= setFlags;
       }
@@ -152,29 +152,29 @@ public class Value<T> where T : notnull
       strValue = Tools.RemoveNonNumericCharacters(strValue);
     }
 
-    if (val is float) {
+    if (_val is float) {
       if (float.TryParse(strValue, out var floatValue)) {
-        val = (T)(object)floatValue;
+        _val = (T)(object)floatValue;
         success = true;
       }
-    } else if (val is int) {
+    } else if (_val is int) {
       var result =
         haveFlag(SetFlag.InputIsHex)
           ? Tools.ParseHexAsInt(strValue)
           : Tools.ParseInt(strValue);
       if (result is not null) {
-        val = (T)(object)result;
+        _val = (T)(object)result;
         success = true;
       }
     } else if (strValue is T sVal) {
-      val = sVal;
+      _val = sVal;
       success = true;
     } else {
       throw new NotImplementedException();
     }
 
     if (success) {
-      updates++;
+      Updates++;
       return true;
     }
 
@@ -184,8 +184,8 @@ public class Value<T> where T : notnull
   public void Set(bool inVal)
   {
     if (inVal is T v) {
-      val = v;
-      updates++;
+      _val = v;
+      Updates++;
     } else {
       throw new InvalidDataException();
     }

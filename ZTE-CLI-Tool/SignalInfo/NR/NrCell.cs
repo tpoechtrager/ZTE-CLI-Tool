@@ -19,10 +19,10 @@ namespace ZTE_Cli_Tool;
 
 public class NrCell : Cell
 {
-  public Value<int> arfcn => freq;
+  public Value<int> Arfcn => Freq;
 
-  public SignalValue<float> rsrp1 = new();
-  public SignalValue<float> rsrp2 = new();
-  public SignalValue<float> rsrq = new();
-  public SignalValue<float> sinr = new();
+  public SignalValue<float> Rsrp1 = new();
+  public SignalValue<float> Rsrp2 = new();
+  public SignalValue<float> Rsrq = new();
+  public SignalValue<float> Sinr = new();
 }

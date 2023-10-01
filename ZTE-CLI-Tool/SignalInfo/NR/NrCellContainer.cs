@@ -26,7 +26,7 @@ public class NrCellContainer : CellContainer<NrCell>
     if (networkType.IsNrNsa && !networkType.IsNrNsaActive) {
       // Base station is capable of 5G NSA
       // but we don't have any reception of the NSA band.
-      cells.Clear();
+      Cells.Clear();
       RemoveOrphanedCells();
       return;
     }
@@ -41,14 +41,14 @@ public class NrCellContainer : CellContainer<NrCell>
      * The API does not reset its memory correctly after switching from
      * 5G CA to 5G without CA.
      */
-    var is_ca = deviceInfo.Nr5gActionChannel == deviceInfo.NrCaPcellFreq;
+    var isCa = deviceInfo.Nr5gActionChannel == deviceInfo.NrCaPcellFreq;
 
     // Main cell
 
-    var _5g_rx0_rsrp = deviceInfo._5gRx0Rsrp;
+    var _5gRx0Rsrp = deviceInfo._5gRx0Rsrp;
 
-    if (string.IsNullOrEmpty(_5g_rx0_rsrp))
-      _5g_rx0_rsrp = deviceInfo.Z5gRsrp;
+    if (string.IsNullOrEmpty(_5gRx0Rsrp))
+      _5gRx0Rsrp = deviceInfo.Z5gRsrp;
 
     Value<int> pci = new();
     Value<int> freq = new();
@@ -58,11 +58,11 @@ public class NrCellContainer : CellContainer<NrCell>
 
     var cell = GetCell(pci, freq) ?? new NrCell();
 
-    cell.scell.Set(false);
-    cell.pci = pci;
-    cell.freq = freq;
-    cell.band.Set(
-        is_ca
+    cell.Scell.Set(false);
+    cell.Pci = pci;
+    cell.Freq = freq;
+    cell.Band.Set(
+        isCa
             ? deviceInfo.NrCaPcellBand
             : NrSigVal(
                 deviceInfo.Nr5gActionNsaBand,
@@ -70,23 +70,23 @@ public class NrCellContainer : CellContainer<NrCell>
             ),
         SetFlag.StripNonNumericCharacters
     );
-    cell.bandwidth.Set(
+    cell.Bandwidth.Set(
       // There is a good change that deviceInfo.bandwidth
       // contains a wrong bandwidth value for NSA.
       // Therefore don't use it for NSA.
       NrSigVal("-1", deviceInfo.Bandwidth),
       SetFlag.StripNonNumericCharacters
     );
-    cell.rsrp1.Update(_5g_rx0_rsrp);
-    cell.rsrp2.Update(deviceInfo._5gRx1Rsrp);
-    cell.rsrq.Update(deviceInfo.Z5gRsrq);
-    cell.sinr.Update(deviceInfo.Z5gSinr, new ValueRemove("-20.0", "-3276.8"));
+    cell.Rsrp1.Update(_5gRx0Rsrp);
+    cell.Rsrp2.Update(deviceInfo._5gRx1Rsrp);
+    cell.Rsrq.Update(deviceInfo.Z5gRsrq);
+    cell.Sinr.Update(deviceInfo.Z5gSinr, new ValueRemove("-20.0", "-3276.8"));
 
     AddOrUpdateCell(cell);
 
     // SCells
 
-    if (!is_ca || string.IsNullOrEmpty(deviceInfo.NrMultiCaScellInfo)) {
+    if (!isCa || string.IsNullOrEmpty(deviceInfo.NrMultiCaScellInfo)) {
       RemoveOrphanedCells();
       return;
     }
@@ -122,14 +122,14 @@ public class NrCellContainer : CellContainer<NrCell>
 
       var scell = GetCell(pci, freq) ?? new NrCell();
 
-      scell.scell.Set(true);
-      scell.pci = pci;
-      scell.freq = freq;
-      scell.band.Set(band);
-      scell.bandwidth.Set(scellData[5], SetFlag.StripNonNumericCharacters);
-      scell.rsrp1.Update(scellData[7], new ValueRemove("0.0"));
-      scell.rsrq.Update(scellData[8], new ValueRemove("0.0"));
-      scell.sinr.Update(scellData[9], new ValueRemove("0.0", "-20.0", "-3276.8"));
+      scell.Scell.Set(true);
+      scell.Pci = pci;
+      scell.Freq = freq;
+      scell.Band.Set(band);
+      scell.Bandwidth.Set(scellData[5], SetFlag.StripNonNumericCharacters);
+      scell.Rsrp1.Update(scellData[7], new ValueRemove("0.0"));
+      scell.Rsrq.Update(scellData[8], new ValueRemove("0.0"));
+      scell.Sinr.Update(scellData[9], new ValueRemove("0.0", "-20.0", "-3276.8"));
 
       AddOrUpdateCell(scell);
     }
