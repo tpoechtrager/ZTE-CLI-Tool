@@ -104,7 +104,7 @@ public class Command
   /// True if the bands are successfully retrieved and printed, false otherwise.
   /// </returns>
 
-  private async Task<bool> PrintSetBandsHelperAsync(Func<Task<IEnumerable<int>?>> getBandsAsync)
+  private static async Task<bool> ShowSetBandsHelperAsync(Func<Task<IEnumerable<int>?>> getBandsAsync)
   {
     var bands = await getBandsAsync();
 
@@ -118,14 +118,14 @@ public class Command
     return true;
   }
 
-  public async Task<bool> PrintNrBandLockAsync()
+  public async Task<bool> ShowNrBandLockAsync()
   {
-    return await PrintSetBandsHelperAsync(_zteClient.GetNrBandLockAsync);
+    return await ShowSetBandsHelperAsync(_zteClient.GetNrBandLockAsync);
   }
 
-  public async Task<bool> PrintLteBandLockAsync()
+  public async Task<bool> ShowLteBandLockAsync()
   {
-    return await PrintSetBandsHelperAsync(_zteClient.GetLteBandLockAsync);
+    return await ShowSetBandsHelperAsync(_zteClient.GetLteBandLockAsync);
   }
 
   /// <summary>
@@ -138,7 +138,7 @@ public class Command
   /// </returns>
   /// 
 
-  private async Task<bool> SetBandLockHelperAsync(
+  private static async Task<bool> SetBandLockHelperAsync(
     Func<IEnumerable<int>?, Task<bool>> setBandLockAsync, string bands, string type)
   {
     IEnumerable<int> bandList = Tools.ConvertBandsToList(bands);
@@ -192,7 +192,7 @@ public class Command
   /// True if the network mode preference was retrieved and printed successfully; otherwise, false.
   /// </returns>
 
-  public async Task<bool> PrintNetworkPreferenceAsync()
+  public async Task<bool> ShowNetworkPreferenceAsync()
   {
     var networkPreference = await _zteClient.GetNetworkModePreference();
 

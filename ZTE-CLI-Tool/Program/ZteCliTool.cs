@@ -42,18 +42,18 @@ public class ZteCliTool
     public string? ExecuteCmd { get; set; } = null;
 
     // NR
-    public bool PrintSetNrBands { get; set; } = false;
+    public bool ShowSetNrBands { get; set; } = false;
     public string? SetNrBandLock { get; set; } = null;
     public string? PerformNrBandHop { get; set; }
 
     // LTE
-    public bool PrintLteBandLock { get; set; } = false;
+    public bool ShowLteBandLock { get; set; } = false;
     public string? SetLteBandLock { get; set; } = null;
 
     // Network
     public bool Connect { get; set; } = false;
     public bool Disconnect { get; set; } = false;
-    public bool PrintNetworkPreference { get; set; } = false;
+    public bool ShowNetworkPreference { get; set; } = false;
     public string? SetNetworkPreference { get; set; } = null;
 
     // Stats
@@ -98,8 +98,8 @@ public class ZteCliTool
 
         // NR
 
-        case "--print-nr-band-lock":
-          parsedArgs.PrintSetNrBands = true;
+        case "--show-nr-band-lock":
+          parsedArgs.ShowSetNrBands = true;
           break;
         case "--set-nr-band-lock":
           parsedArgs.SetNrBandLock = getNextArg();
@@ -110,8 +110,8 @@ public class ZteCliTool
 
         // LTE
 
-        case "--print-lte-band-lock":
-          parsedArgs.PrintLteBandLock = true;
+        case "--show-lte-band-lock":
+          parsedArgs.ShowLteBandLock = true;
           break;
         case "--set-lte-band-lock":
           parsedArgs.SetLteBandLock = getNextArg();
@@ -127,8 +127,8 @@ public class ZteCliTool
           parsedArgs.Disconnect = true;
           break;
 
-        case "--print-network-preference":
-          parsedArgs.PrintNetworkPreference = true;
+        case "--show-network-preference":
+          parsedArgs.ShowNetworkPreference = true;
           break;
 
         case "--set-network-preference":
@@ -181,8 +181,8 @@ public class ZteCliTool
 
     // NR
 
-    else if (parsedArgs.PrintSetNrBands) {
-      return await _command.PrintNrBandLockAsync();
+    else if (parsedArgs.ShowSetNrBands) {
+      return await _command.ShowNrBandLockAsync();
     } else if (parsedArgs.SetNrBandLock is not null) {
       return await _command.SetNrBandLockAsync(parsedArgs.SetNrBandLock);
     } else if (parsedArgs.PerformNrBandHop is not null) {
@@ -191,8 +191,8 @@ public class ZteCliTool
 
     // LTE
 
-    else if (parsedArgs.PrintLteBandLock) {
-      return await _command.PrintLteBandLockAsync();
+    else if (parsedArgs.ShowLteBandLock) {
+      return await _command.ShowLteBandLockAsync();
     } else if (parsedArgs.SetLteBandLock is not null) {
       return await _command.SetLteBandLockAsync(parsedArgs.SetLteBandLock);
     }
@@ -203,8 +203,8 @@ public class ZteCliTool
       return await _command.ConnectAsync();
     } else if (parsedArgs.Disconnect) {
       return await _command.DisconnectAsync();
-    } else if (parsedArgs.PrintNetworkPreference) {
-      return await _command.PrintNetworkPreferenceAsync();
+    } else if (parsedArgs.ShowNetworkPreference) {
+      return await _command.ShowNetworkPreferenceAsync();
     } else if (parsedArgs.SetNetworkPreference is not null) {
       return await _command.SetNetworkPreferenceAsync(parsedArgs.SetNetworkPreference);
     }
