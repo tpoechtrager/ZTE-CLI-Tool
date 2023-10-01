@@ -223,18 +223,30 @@ public class Command
   }
 
   /// <summary>
-  /// This method continuously updates and displays device statistics.
+  /// Runs the device statistics update and display process.
   /// </summary>
-  /// <param name="updateStats">A function that updates statistics.</param>
-  /// <param name="printStats">An action to print the updated statistics.</param>
-  /// <param name="interval">The time interval in milliseconds between updates (default is 1000ms).</param>
+  /// <param name="updateStats">
+  ///   A function that updates statistics based on device information.
+  /// </param>
+  /// <param name="printStats">
+  ///   An action to print the updated statistics to the console.
+  /// </param>
+  /// <param name="interval">
+  ///   The time interval in milliseconds between updates. 
+  ///   Use -1 to run the update process once without continuous updates;
+  ///   otherwise, specify the desired interval (default is 1000ms).
+  /// </param>
+  /// <returns>
+  ///   Returns false if an update fails; returns true if the interval is set to -1
+  ///   and the update and displaying succeed; otherwise, this method may never return.
+  /// </returns>
 
   private async Task<bool> ShowStatsHelperAsync(
-    Func<DeviceInfo, bool> updateStats, Action printStats, int interval = 1000)
+    Func<DeviceInfo, bool>? updateStats, Action<DeviceInfo> printStats, int interval = 1000)
   {
     while (true) {
       if (!await _zteClient.CheckLoginAsync()) {
-        break;
+        return false;
       }
 
       await _zteClient.PreventAutoLogoutAsync();
@@ -246,18 +258,27 @@ public class Command
 
       Console.Clear();
 
-      if (!updateStats(_zteClient.DeviceInfo)) {
+      if (updateStats is not null && !updateStats(_zteClient.DeviceInfo)) {
         Console.Error.WriteLine("Updating stats failed!");
         return false;
       }
 
-      printStats();
+      printStats(_zteClient.DeviceInfo);
+
+      if (interval == -1) {
+        return true;
+      }
 
       Thread.Sleep(interval);
     }
-
-    return false;
   }
+
+  /// <summary>
+  /// Continuously displays real-time signal information.
+  /// </summary>
+  /// <returns>
+  /// Returns false if an error occurs; otherwise, this method may never return.
+  /// </returns>
 
   public async Task<bool> ShowSignalInfoAsync()
   {
@@ -265,10 +286,73 @@ public class Command
     return await ShowStatsHelperAsync(SignalInfo.Update, SignalInfo.PrintSignalInfo);
   }
 
+  /// <summary>
+  /// Displays total traffic statistics for the current month.
+  /// </summary>
+  /// <returns>
+  /// Returns true if the operation succeeds; otherwise, false.
+  /// </returns>
+
+  public async Task<bool> ShowTotalTrafficStatsAsync()
+  {
+    static void printTotalTrafficStats(DeviceInfo deviceInfo)
+    {
+      DateTime start = DateTime.Now.AddSeconds(-Tools.ParseInt(deviceInfo.TotalTime, 0));
+
+      Console.WriteLine("-- Total traffic statistics for current month --" + Environment.NewLine);
+
+      Console.WriteLine("Start: " + start.ToString("yyyy-MM-dd HH:mm") + Environment.NewLine);
+
+      Console.WriteLine("DL: {0}", Tools.FormatBytes(deviceInfo.TotalRxBytes));
+      Console.WriteLine("UL: {0}", Tools.FormatBytes(deviceInfo.TotalTxBytes));
+
+      Console.WriteLine("");
+
+      Console.WriteLine("DL Packets: {0}", deviceInfo.TotalRxPackets);
+      Console.WriteLine("UL Packets: {0}", deviceInfo.TotalTxPackets);
+    }
+
+    return await ShowStatsHelperAsync(null, printTotalTrafficStats, -1);
+  }
+
+  /// <summary>
+  /// Displays traffic statistics for the current month.
+  /// </summary>
+  /// <returns>
+  /// Returns true if the operation succeeds; otherwise, false.
+  /// </returns>
+
+  public async Task<bool> ShowMonthlyTrafficStatsAsync()
+  {
+    static void printMonthlyTrafficStats(DeviceInfo deviceInfo)
+    {
+      DateTime start = DateTime.Now.AddSeconds(-Tools.ParseInt(deviceInfo.MonthlyTime, 0));
+
+      Console.WriteLine("-- Traffic statistics for current month --" + Environment.NewLine);
+
+      Console.WriteLine("Start: " + start.ToString("yyyy-MM-dd HH:mm") + Environment.NewLine);
+
+      Console.WriteLine("DL: {0}", Tools.FormatBytes(deviceInfo.MonthlyRxBytes));
+      Console.WriteLine("UL: {0}", Tools.FormatBytes(deviceInfo.MonthlyTxBytes));
+
+      Console.WriteLine("");
+
+      Console.WriteLine("DL Packets: {0}", deviceInfo.MonthlyRxPackets);
+      Console.WriteLine("UL Packets: {0}", deviceInfo.MonthlyTxPackets);
+    }
+
+    return await ShowStatsHelperAsync(null, printMonthlyTrafficStats, -1);
+  }
+
+  /// <summary>
+  /// Continuously displays live traffic statistics.
+  /// </summary>
+  /// <returns>
+  /// Returns false if an error occurs; otherwise, this method may never return.
+  /// </returns>
+
   public async Task<bool> ShowLiveTrafficStatsAsync()
   {
-    DeviceInfo deviceInfo = new();
-
     ThroughputCalculator rxPackets = new();
     ThroughputCalculator txPackets = new();
 
@@ -276,12 +360,10 @@ public class Command
     {
       rxPackets.Update(deviceInfoNew.RealtimeRxPackets);
       txPackets.Update(deviceInfoNew.RealtimeTxPackets);
-
-      deviceInfo = deviceInfoNew;
       return true;
     }
 
-    void printTrafficStats()
+    void printTrafficStats(DeviceInfo deviceInfo)
     {
       Console.Write("DL: {0:0.00} Mbit/s  UL: {1:0.00} Mbit/s",
         Tools.BytesToMbits(deviceInfo.RealtimeRxThrpt),
@@ -298,4 +380,6 @@ public class Command
 
     return await ShowStatsHelperAsync(updateTrafficStats, printTrafficStats, 2000);
   }
+
+
 }

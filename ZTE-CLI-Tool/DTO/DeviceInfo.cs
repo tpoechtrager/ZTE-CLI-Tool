@@ -207,11 +207,23 @@ public class DeviceInfo
   [JsonPropertyName("monthly_drop_rx_packets")]
   public string MonthlyDropRxPackets { get; set; } = string.Empty;
 
+  [JsonPropertyName("monthly_drop_tx_packets")]
+  public string MonthlyDropTxPackets { get; set; } = string.Empty;
+
   [JsonPropertyName("monthly_rx_bytes")]
   public string MonthlyRxBytes { get; set; } = string.Empty;
 
   [JsonPropertyName("monthly_rx_packets")]
   public string MonthlyRxPackets { get; set; } = string.Empty;
+
+  [JsonPropertyName("monthly_time")]
+  public string MonthlyTime { get; set; } = string.Empty;
+
+  [JsonPropertyName("monthly_tx_bytes")]
+  public string MonthlyTxBytes { get; set; } = string.Empty;
+
+  [JsonPropertyName("monthly_tx_packets")]
+  public string MonthlyTxPackets { get; set; } = string.Empty;
 
   [JsonPropertyName("peak_rx_bytes")]
   public string PeakRxBytes { get; set; } = string.Empty;
@@ -225,11 +237,20 @@ public class DeviceInfo
   [JsonPropertyName("realtime_rx_packets")]
   public string RealtimeRxPackets { get; set; } = string.Empty;
 
+  [JsonPropertyName("realtime_tx_packets")]
+  public string RealtimeTxPackets { get; set; } = string.Empty;
+
   [JsonPropertyName("realtime_rx_thrpt")]
   public string RealtimeRxThrpt { get; set; } = string.Empty;
 
+  [JsonPropertyName("realtime_tx_thrpt")]
+  public string RealtimeTxThrpt { get; set; } = string.Empty;
+
   [JsonPropertyName("total_drop_rx_packets")]
   public string TotalDropRxPackets { get; set; } = string.Empty;
+
+  [JsonPropertyName("total_drop_tx_packets")]
+  public string TotalDropTxPackets { get; set; } = string.Empty;
 
   [JsonPropertyName("total_rx_bytes")]
   public string TotalRxBytes { get; set; } = string.Empty;
@@ -237,59 +258,8 @@ public class DeviceInfo
   [JsonPropertyName("total_rx_packets")]
   public string TotalRxPackets { get; set; } = string.Empty;
 
-  [JsonPropertyName("traffic_month_home_drop_rx_packets")]
-  public string TrafficMonthHomeDropRxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_month_home_rx_packets")]
-  public string TrafficMonthHomeRxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_month_internal_drop_rx_packets")]
-  public string TrafficMonthInternalDropRxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_month_internal_rx_packets")]
-  public string TrafficMonthInternalRxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_month_roam_drop_rx_packets")]
-  public string TrafficMonthRoamDropRxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_month_roam_rx_packets")]
-  public string TrafficMonthRoamRxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_total_home_drop_rx_packets")]
-  public string TrafficTotalHomeDropRxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_total_home_rx_packets")]
-  public string TrafficTotalHomeRxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_total_internal_drop_rx_packets")]
-  public string TrafficTotalInternalDropRxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_total_roam_drop_rx_packets")]
-  public string TrafficTotalRoamDropRxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_total_roam_rx_packets")]
-  public string TrafficTotalRoamRxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("wan_curr_rx_bytes")]
-  public string WanCurrRxBytes { get; set; } = string.Empty;
-
-  [JsonPropertyName("peak_tx_bytes")]
-  public string PeakTxBytes { get; set; } = string.Empty;
-
-  [JsonPropertyName("realtime_drop_tx_packets")]
-  public string RealtimeDropTxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("realtime_tx_bytes")]
-  public string RealtimeTxBytes { get; set; } = string.Empty;
-
-  [JsonPropertyName("realtime_tx_packets")]
-  public string RealtimeTxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("realtime_tx_thrpt")]
-  public string RealtimeTxThrpt { get; set; } = string.Empty;
-
-  [JsonPropertyName("total_drop_tx_packets")]
-  public string TotalDropTxPackets { get; set; } = string.Empty;
+  [JsonPropertyName("total_time")]
+  public string TotalTime { get; set; } = string.Empty;
 
   [JsonPropertyName("total_tx_bytes")]
   public string TotalTxBytes { get; set; } = string.Empty;
@@ -297,58 +267,6 @@ public class DeviceInfo
   [JsonPropertyName("total_tx_packets")]
   public string TotalTxPackets { get; set; } = string.Empty;
 
-  [JsonPropertyName("traffic_em_profile_realtime_tx")]
-  public string TrafficEmProfileRealtimeTx { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_month_home_drop_tx_packets")]
-  public string TrafficMonthHomeDropTxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_month_home_tx")]
-  public string TrafficMonthHomeTx { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_month_home_tx_packets")]
-  public string TrafficMonthHomeTxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_month_internal_drop_tx_packets")]
-  public string TrafficMonthInternalDropTxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_month_internal_tx")]
-  public string TrafficMonthInternalTx { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_month_internal_tx_packets")]
-  public string TrafficMonthInternalTxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_month_roam_drop_tx_packets")]
-  public string TrafficMonthRoamDropTxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_month_roam_tx")]
-  public string TrafficMonthRoamTx { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_month_roam_tx_packets")]
-  public string TrafficMonthRoamTxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_sbm_profile_realtime_tx")]
-  public string TrafficSbmProfileRealtimeTx { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_total_home_drop_tx_packets")]
-  public string TrafficTotalHomeDropTxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_total_home_tx")]
-  public string TrafficTotalHomeTx { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_total_home_tx_packets")]
-  public string TrafficTotalHomeTxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_total_internal_drop_tx_packets")]
-  public string TrafficTotalInternalDropTxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_total_roam_drop_tx_packets")]
-  public string TrafficTotalRoamDropTxPackets { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_total_roam_tx")]
-  public string TrafficTotalRoamTx { get; set; } = string.Empty;
-
-  [JsonPropertyName("traffic_total_roam_tx_packets")]
-  public string TrafficTotalRoamTxPackets { get; set; } = string.Empty;
+  [JsonPropertyName("wan_curr_rx_bytes")]
+  public string WanCurrRxBytes { get; set; } = string.Empty;
 }
-

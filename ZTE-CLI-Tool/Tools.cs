@@ -196,7 +196,7 @@ public static class Tools
     }
   }
 
-  public static string FormatBytes(long bytes)
+  public static string FormatBytes(Int64 bytes, int decimals = 2)
   {
     string[] suffixes = { "Bytes", "KB", "MB", "GB", "TB", "PB" };
     int index = 0;
@@ -207,8 +207,15 @@ public static class Tools
       index++;
     }
 
-    return $"{size:F2} {suffixes[index]}";
+    if (index >= suffixes.Length) {
+      return "Input is too large to format.";
+    }
+
+    return String.Format("{0:F" + decimals + "} {1}", size, suffixes[index]);
   }
+
+  public static string FormatBytes(string bytesStr, int decimals = 2)
+  => FormatBytes(ParseInt64(bytesStr, -1));
 
   public static double BytesToMbits(Int64 bytes)
   {

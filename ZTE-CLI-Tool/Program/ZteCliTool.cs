@@ -57,8 +57,10 @@ public class ZteCliTool
     public string? SetNetworkPreference { get; set; } = null;
 
     // Stats
-    public bool showSignalInfo { get; set; } = true;
-    public bool showLiveTrafficStats { get; set; } = false;
+    public bool ShowLiveTrafficStats { get; set; } = false;
+    public bool ShowTotalTrafficStats { get; set; } = false;
+    public bool ShowMonthlyTrafficStats { get; set; } = false;
+    public bool ShowSignalInfo { get; set; } = true;
   }
 
   private CommandLineArgs? ParseCommandLineArgs(string[] args)
@@ -135,14 +137,21 @@ public class ZteCliTool
 
         // Stats
 
-        case "--show-signal-info":
-        case "--stats":
-        case "--signal":
-          parsedArgs.showSignalInfo = true;
+        case "--show-live-traffic":
+          parsedArgs.ShowLiveTrafficStats = true;
           break;
 
-        case "--show-live-traffic-stats":
-          parsedArgs.showLiveTrafficStats = true;
+        case "--show-total-traffic":
+          parsedArgs.ShowTotalTrafficStats = true;
+          break;
+
+        case "--show-monthly-traffic":
+          parsedArgs.ShowMonthlyTrafficStats = true;
+          break;
+
+        case "--show-signal-info":
+        case "--show-signal":
+          parsedArgs.ShowSignalInfo = true;
           break;
 
         default:
@@ -202,11 +211,15 @@ public class ZteCliTool
 
     // Stats
 
-    else if (parsedArgs.showLiveTrafficStats) {
+    else if (parsedArgs.ShowLiveTrafficStats) {
       return await _command.ShowLiveTrafficStatsAsync();
+    } else if (parsedArgs.ShowTotalTrafficStats) {
+      return await _command.ShowTotalTrafficStatsAsync();
+    } else if (parsedArgs.ShowMonthlyTrafficStats) {
+      return await _command.ShowMonthlyTrafficStatsAsync();
     }
     // Must be ALWAYS last
-    else if (parsedArgs.showSignalInfo) {
+    else if (parsedArgs.ShowSignalInfo) {
       return await _command.ShowSignalInfoAsync();
     }
 

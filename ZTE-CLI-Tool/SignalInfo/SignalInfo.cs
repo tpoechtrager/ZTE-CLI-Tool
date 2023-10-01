@@ -91,7 +91,7 @@ public class SignalInfo
     return true;
   }
 
-  public void PrintSignalInfo()
+  public void PrintSignalInfo(DeviceInfo _)
   {
     Console.WriteLine("Signal Info:");
     Console.WriteLine();
