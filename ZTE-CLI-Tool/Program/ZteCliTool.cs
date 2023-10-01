@@ -58,7 +58,7 @@ public class ZteCliTool
 
     // Stats
     public bool showSignalInfo { get; set; } = true;
-    public bool showTrafficStatus { get; set; } = false;
+    public bool showLiveTrafficStats { get; set; } = false;
   }
 
   private CommandLineArgs? ParseCommandLineArgs(string[] args)
@@ -141,6 +141,10 @@ public class ZteCliTool
           parsedArgs.showSignalInfo = true;
           break;
 
+        case "--show-live-traffic-stats":
+          parsedArgs.showLiveTrafficStats = true;
+          break;
+
         default:
           _logger.LogError($"Unknown command line argument: {arg}");
           return null;
@@ -198,6 +202,10 @@ public class ZteCliTool
 
     // Stats
 
+    else if (parsedArgs.showLiveTrafficStats) {
+      return await _command.ShowLiveTrafficStatsAsync();
+    }
+    // Must be ALWAYS last
     else if (parsedArgs.showSignalInfo) {
       return await _command.ShowSignalInfoAsync();
     }

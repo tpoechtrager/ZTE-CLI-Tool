@@ -54,12 +54,31 @@ public static class Tools
 
   public static bool IsNumber(string str)
   {
-    return float.TryParse(str, out _);
+    return double.TryParse(str, out _);
   }
 
   public static int? ParseInt(string str)
   {
     if (int.TryParse(str, out int val)) {
+      return val;
+    }
+
+    return null;
+  }
+
+  public static Int64 ParseInt64(string str, Int64 errorValue)
+  {
+    if (Int64.TryParse(str, out Int64 val)) {
+      return val;
+    }
+
+    return errorValue;
+  }
+
+
+  public static Int64? ParseInt64(string str)
+  {
+    if (Int64.TryParse(str, out Int64 val)) {
       return val;
     }
 
@@ -190,4 +209,15 @@ public static class Tools
 
     return $"{size:F2} {suffixes[index]}";
   }
+
+  public static double BytesToMbits(Int64 bytes)
+  {
+    // Convert bytes to bits
+    Int64 bits = bytes * 8;
+    // Convert bits to megabits
+    return bits / (1024.0 * 1024.0);
+  }
+
+  public static double BytesToMbits(string bytesStr)
+    => BytesToMbits(ParseInt64(bytesStr, -1));
 }

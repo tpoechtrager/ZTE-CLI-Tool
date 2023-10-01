@@ -2,7 +2,7 @@
   "profiles": {
     "ZTE-Cli-Tool": {
       "commandName": "Project",
-      "commandLineArgs": "--stats\r\n"
+      "commandLineArgs": "--show-live-traffic-stats"
     }
   }
 }

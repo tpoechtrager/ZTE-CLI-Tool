@@ -18,6 +18,7 @@
 using Microsoft.Extensions.Logging;
 using ZTE_Cli_Tool.DTO;
 using ZTE_Cli_Tool.Service.Interface;
+using ZTE_Cli_Tool.TrafficThroughput;
 
 namespace ZTE_Cli_Tool.Program;
 
@@ -262,5 +263,39 @@ public class Command
   {
     SignalInfo.SignalInfo SignalInfo = new();
     return await ShowStatsHelperAsync(SignalInfo.Update, SignalInfo.PrintSignalInfo);
+  }
+
+  public async Task<bool> ShowLiveTrafficStatsAsync()
+  {
+    DeviceInfo deviceInfo = new();
+
+    ThroughputCalculator rxPackets = new();
+    ThroughputCalculator txPackets = new();
+
+    bool updateTrafficStats(DeviceInfo deviceInfoNew)
+    {
+      rxPackets.Update(deviceInfoNew.RealtimeRxPackets);
+      txPackets.Update(deviceInfoNew.RealtimeTxPackets);
+
+      deviceInfo = deviceInfoNew;
+      return true;
+    }
+
+    void printTrafficStats()
+    {
+      Console.Write("DL: {0:0.00} Mbit/s  UL: {1:0.00} Mbit/s",
+        Tools.BytesToMbits(deviceInfo.RealtimeRxThrpt),
+        Tools.BytesToMbits(deviceInfo.RealtimeTxThrpt));
+
+      if (rxPackets.Updates < 2) {
+        Console.WriteLine("");
+        return;
+      }
+
+      Console.WriteLine("  |  DL: {0:0} p/s  UL: {1:0} p/s",
+        rxPackets.Throughput, txPackets.Throughput);
+    }
+
+    return await ShowStatsHelperAsync(updateTrafficStats, printTrafficStats, 2000);
   }
 }
