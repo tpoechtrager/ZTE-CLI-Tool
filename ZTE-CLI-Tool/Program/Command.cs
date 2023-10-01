@@ -299,9 +299,9 @@ public class Command
     {
       DateTime start = DateTime.Now.AddSeconds(-Tools.ParseInt(deviceInfo.TotalTime, 0));
 
-      Console.WriteLine("-- Total traffic statistics for current month --" + Environment.NewLine);
+      Console.WriteLine("-- Total traffic statistics --" + Environment.NewLine);
 
-      Console.WriteLine("Start: " + start.ToString("yyyy-MM-dd HH:mm") + Environment.NewLine);
+      Console.WriteLine("Start: " + start.ToString("yyyy-MM-dd") + Environment.NewLine);
 
       Console.WriteLine("DL: {0}", Tools.FormatBytes(deviceInfo.TotalRxBytes));
       Console.WriteLine("UL: {0}", Tools.FormatBytes(deviceInfo.TotalTxBytes));
@@ -330,7 +330,7 @@ public class Command
 
       Console.WriteLine("-- Traffic statistics for current month --" + Environment.NewLine);
 
-      Console.WriteLine("Start: " + start.ToString("yyyy-MM-dd HH:mm") + Environment.NewLine);
+      Console.WriteLine("Start: " + start.ToString("yyyy-MM-dd") + Environment.NewLine);
 
       Console.WriteLine("DL: {0}", Tools.FormatBytes(deviceInfo.MonthlyRxBytes));
       Console.WriteLine("UL: {0}", Tools.FormatBytes(deviceInfo.MonthlyTxBytes));
@@ -380,6 +380,4 @@ public class Command
 
     return await ShowStatsHelperAsync(updateTrafficStats, printTrafficStats, 2000);
   }
-
-
 }
