@@ -497,14 +497,18 @@ public class ZteClient : IZteClient, IDisposable
     {"TD-SCDMA+WCDMA+2G+4G", "TDSCDMA_WCDMA_GSM_LTE"},
     {"TD-SCDMA+WCDMA+HDR+CDMA+2G+4G", "TDSCDMA_WCDMA_HDR_CDMA_GSM_LTE"},
     {"TDSCDMA+WCDMA", "TDSCDMA_AND_WCDMA"},
+    {"2G_preferred", "GSM_preferred"},
     {"3G_preferred", "WCDMA_preferred"},
+    {"4G_preferred", "LTE_preferred"},
     {"TCHGWL+5G", "TCHGWL_5G"},
     {"TGWL+5G", "TGWL_AND_5G"},
     {"WL+5G", "WL_AND_5G"},
 
     {"LTE", "Only_LTE"},
     {"NSA", "Only_5G"},
-    {"SA", "Only_5G"}
+    {"SA", "Only_5G"},
+
+    {"AUTO", "NETWORK_auto"}
   };
 
   private string? GetNetworkPreferenceValue(string mode, bool reverse = false)

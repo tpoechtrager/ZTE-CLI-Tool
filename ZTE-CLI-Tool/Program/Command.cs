@@ -16,6 +16,10 @@
  */
 
 using Microsoft.Extensions.Logging;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Text.Json;
 using ZTE_Cli_Tool.DTO;
 using ZTE_Cli_Tool.Service.Interface;
 using ZTE_Cli_Tool.TrafficThroughput;
@@ -379,5 +383,76 @@ public class Command
     }
 
     return await ShowStatsHelperAsync(updateTrafficStats, printTrafficStats, 2000);
+  }
+
+  /// <summary>
+  /// Initializes a UDP server on a specified port, capable of sending processed or raw 
+  /// signal and device information. Responds to "++" with processed signal info, and "+++" with raw 
+  /// device/signal info.
+  /// </summary>
+  /// <param name="port">Port number as a string for the server to listen on.</param>
+  /// <remarks>
+  /// Command "++": Sends processed signal information based on updated data from the device. Command 
+  /// "+++": Sends raw device and signal information without additional processing.
+  /// </remarks>
+
+
+  public async Task<bool> UdpServerAsync(string port)
+  {
+    int listenPort = Tools.ParseInt(port, -1);
+
+    if (listenPort < 0 || listenPort > 65535) {
+      return false;
+    }
+
+    UdpClient listener = new UdpClient(listenPort);
+    IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, listenPort);
+
+    SignalInfo.SignalInfo signalInfo = new();
+
+    while (true) {
+      try {
+        var checkRead = new List<Socket> { listener.Client };
+
+        if (!await _zteClient.CheckLoginAsync()) {
+          return false;
+        }
+
+        await _zteClient.PreventAutoLogoutAsync();
+        await _zteClient.UpdateDeviceInfoAsync();
+
+        Socket.Select(checkRead, null, null, 1000 * 1000); // 1 second
+
+        if (!checkRead.Contains(listener.Client)) {
+          continue;
+        }
+
+        byte[] bytes = listener.Receive(ref groupEP);
+        string message = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
+
+        string replyAsString = message + "\n";
+
+        switch (message) {
+          case "++": {
+            signalInfo.Update(_zteClient.DeviceInfo);
+            var options = new JsonSerializerOptions {
+              WriteIndented = true
+            };
+            replyAsString += JsonSerializer.Serialize(signalInfo, options);
+            break;
+          }
+
+          case "+++": {
+            replyAsString += JsonSerializer.Serialize(_zteClient.DeviceInfo);
+            break;
+          }
+        }
+
+        byte[] reply = Encoding.UTF8.GetBytes(replyAsString);
+        listener.Send(reply, reply.Length, groupEP);
+      } catch (Exception e) {
+        Console.WriteLine(e.ToString());
+      }
+    }
   }
 }

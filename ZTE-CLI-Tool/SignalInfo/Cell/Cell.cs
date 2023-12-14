@@ -19,12 +19,12 @@ namespace ZTE_Cli_Tool;
 
 public class Cell : CellIdentifier
 {
-  public Value<int> Band = new();
-  public Value<float> Bandwidth = new();
-  public Value<bool> Scell = new();
+  public Value<int> Band { get; set; } = new();
+  public Value<float> Bandwidth { get; set; } = new();
+  public Value<bool> Scell { get; set; } = new();
 
   public bool IsPrimaryCell => Scell == false;
-  public bool IsSecondaryCell => Scell == false;
+  public bool IsSecondaryCell => Scell == true;
 
   public static bool operator ==(Cell a, Cell b)
   {

@@ -21,8 +21,9 @@ public class NrCell : Cell
 {
   public Value<int> Arfcn => Freq;
 
-  public SignalValue<float> Rsrp1 = new();
-  public SignalValue<float> Rsrp2 = new();
-  public SignalValue<float> Rsrq = new();
-  public SignalValue<float> Sinr = new();
+  public SignalValue<float> PrimaryRsrp { get; set; } = new();
+  public SignalValue<float> Rsrp1 { get; set; } = new();
+  public SignalValue<float> Rsrp2 { get; set; } = new();
+  public SignalValue<float> Rsrq { get; set; } = new();
+  public SignalValue<float> Sinr { get; set; } = new();
 }

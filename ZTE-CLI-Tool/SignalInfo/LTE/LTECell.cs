@@ -21,14 +21,14 @@ public class LteCell : Cell
 {
   public Value<int> Earfcn => Freq;
 
-  public SignalValue<int> Rssi = new();
-  public SignalValue<float> Rsrp1 = new();
-  public SignalValue<float> Rsrp2 = new();
-  public SignalValue<float> Rsrp3 = new();
-  public SignalValue<float> Rsrp4 = new();
-  public SignalValue<float> Rsrq = new();
-  public SignalValue<float> Sinr1 = new();
-  public SignalValue<float> Sinr2 = new();
-  public SignalValue<float> Sinr3 = new();
-  public SignalValue<float> Sinr4 = new();
+  public SignalValue<int> Rssi { get; set; } = new();
+  public SignalValue<float> Rsrp1 { get; set; } = new();
+  public SignalValue<float> Rsrp2 { get; set; } = new();
+  public SignalValue<float> Rsrp3 { get; set; } = new();
+  public SignalValue<float> Rsrp4 { get; set; } = new();
+  public SignalValue<float> Rsrq { get; set; } = new();
+  public SignalValue<float> Sinr1 { get; set; } = new();
+  public SignalValue<float> Sinr2 { get; set; } = new();
+  public SignalValue<float> Sinr3 { get; set; } = new();
+  public SignalValue<float> Sinr4 { get; set; } = new();
 };

@@ -61,6 +61,9 @@ public class ZteCliTool
     public bool ShowTotalTrafficStats { get; set; } = false;
     public bool ShowMonthlyTrafficStats { get; set; } = false;
     public bool ShowSignalInfo { get; set; } = true;
+
+    // Udp Server
+    public string? UdpServer { get; set; } = null;
   }
 
   private CommandLineArgs? ParseCommandLineArgs(string[] args)
@@ -154,6 +157,12 @@ public class ZteCliTool
           parsedArgs.ShowSignalInfo = true;
           break;
 
+        // Udp Server
+
+        case "--udp-server":
+          parsedArgs.UdpServer = getNextArg();
+          break;
+
         default:
           _logger.LogError($"Unknown command line argument: {arg}");
           return null;
@@ -218,6 +227,13 @@ public class ZteCliTool
     } else if (parsedArgs.ShowMonthlyTrafficStats) {
       return await _command.ShowMonthlyTrafficStatsAsync();
     }
+
+    // Udp Server
+
+    else if (parsedArgs.UdpServer is not null) {
+      return await _command.UdpServerAsync(parsedArgs.UdpServer);
+    }
+
     // Must be ALWAYS last
     else if (parsedArgs.ShowSignalInfo) {
       return await _command.ShowSignalInfoAsync();

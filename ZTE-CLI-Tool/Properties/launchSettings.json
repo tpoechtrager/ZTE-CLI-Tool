@@ -2,7 +2,7 @@
   "profiles": {
     "ZTE-Cli-Tool": {
       "commandName": "Project",
-      "commandLineArgs": "--show-live-traffic-stats"
+      "commandLineArgs": "--udp-server 11000"
     }
   }
 }

@@ -19,6 +19,6 @@ namespace ZTE_Cli_Tool;
 
 public class CellIdentifier
 {
-  public Value<int> Pci = new();
-  public Value<int> Freq = new();
+  public Value<int> Pci { get; set; } = new();
+  public Value<int> Freq { get; set; } = new();
 }

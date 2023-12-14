@@ -79,6 +79,7 @@ public class NrCellContainer : CellContainer<NrCell>
     );
     cell.Rsrp1.Update(_5gRx0Rsrp);
     cell.Rsrp2.Update(deviceInfo._5gRx1Rsrp);
+    cell.PrimaryRsrp.Update(deviceInfo.Z5gRsrp);
     cell.Rsrq.Update(deviceInfo.Z5gRsrq);
     cell.Sinr.Update(deviceInfo.Z5gSinr, new ValueRemove("-20.0", "-3276.8"));
 
