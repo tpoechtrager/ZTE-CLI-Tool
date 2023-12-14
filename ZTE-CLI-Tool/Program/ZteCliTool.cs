@@ -64,6 +64,9 @@ public class ZteCliTool
 
     // Udp Server
     public string? UdpServer { get; set; } = null;
+
+    // Generic parameters
+    public string? loginRetryWait { get; set; } = null;
   }
 
   private CommandLineArgs? ParseCommandLineArgs(string[] args)
@@ -163,6 +166,12 @@ public class ZteCliTool
           parsedArgs.UdpServer = getNextArg();
           break;
 
+        // Generic parameters
+
+        case "--login-retry-wait":
+          parsedArgs.loginRetryWait = getNextArg();
+          break;
+
         default:
           _logger.LogError($"Unknown command line argument: {arg}");
           return null;
@@ -256,7 +265,16 @@ public class ZteCliTool
 
     // Create zteClient instance
 
-    await _zteClient.InitializeServiceAsync(parsedArgs.RouterIp, parsedArgs.RouterPassword);
+    int? loginRetryWait = null;
+
+    if (parsedArgs.loginRetryWait is not null) {
+      loginRetryWait = Tools.ParseInt(parsedArgs.loginRetryWait);
+    }
+
+    await _zteClient.InitializeServiceAsync(
+      parsedArgs.RouterIp,
+      parsedArgs.RouterPassword,
+      loginRetryWait ?? 1000);
 
     // Perform login
 

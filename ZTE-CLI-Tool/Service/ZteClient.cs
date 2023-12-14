@@ -32,6 +32,7 @@ public class ZteClient : IZteClient, IDisposable
   private bool _useNewApi = false;
   private Func<string, string> _hash = Tools.ZteMd5;
 
+  private int _loginRetryWait = 1000;
   private bool _loggedIn = false;
   private int _successfulLogins = 0;
 
@@ -78,8 +79,9 @@ public class ZteClient : IZteClient, IDisposable
     _zteHttpClient = zteHttpClient;
   }
 
-  public async Task InitializeServiceAsync(string routerIpAddress, string routerPassword)
+  public async Task InitializeServiceAsync(string routerIpAddress, string routerPassword, int loginRetryWait)
   {
+    _loginRetryWait = loginRetryWait;
     _routerPassword = routerPassword;
     await _zteHttpClient.InitializeAsync(routerIpAddress);
 
@@ -306,8 +308,8 @@ public class ZteClient : IZteClient, IDisposable
     while (!_loggedIn) {
       // For debugging purposes
       if (_successfulLogins >= 1) {
-        _logger.LogInformation("Waiting 20 seconds before the next login attempt ...");
-        Thread.Sleep(20000);
+        _logger.LogInformation("Waiting {0} second(s) before the next login attempt ...", _loginRetryWait / 1000);
+        Thread.Sleep(_loginRetryWait);
       }
 
       int? loginResult;

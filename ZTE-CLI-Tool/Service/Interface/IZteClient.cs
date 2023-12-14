@@ -34,7 +34,8 @@ public interface IZteClient : IDisposable
   /// </summary>
   /// <param name="routerIpAddress">The IP address of the router.</param>
   /// <param name="routerPassword">The password for the router.</param>
-  Task InitializeServiceAsync(string routerIpAddress, string routerPassword);
+  /// <param name="loginRetryWait">Login throttling in milliseconds</param>
+  Task InitializeServiceAsync(string routerIpAddress, string routerPassword, int loginRetryWait);
 
   /// <summary>
   /// Attempts to log in and returns a LoginErrorCode.
